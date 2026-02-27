@@ -10,14 +10,9 @@ Branch names should use the following pattern.
 
 `fix/` = fix an existing issue
 
-`update/` = update an existing feature
+`feat/` = add a new feature or update an existing feature
 
-`add/` = add a new feature
-
-`remove/` = remove an existing feature
-
-
-Some examples are `add/sleep-timer` and `fix/notifications-crash`.
+Some examples are `feat/sleep-timer` and `fix/notifications-crash`.
 
 ## Raise a Pull Request
 
