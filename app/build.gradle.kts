@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.kapt)
+    alias(libs.plugins.jetbrains.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.google.services)
@@ -23,9 +23,7 @@ android {
         versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        vectorDrawables { useSupportLibrary = true }
     }
     signingConfigs {
         getByName("debug") {
@@ -66,27 +64,21 @@ android {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
     }
-    kotlinOptions {
-        jvmTarget = libs.versions.java.get()
-    }
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/okhttp3/internal/publicsuffix/NOTICE"
-            excludes += "/kotlin/**"
-            excludes += "/META-INF/androidx.*.version"
-            excludes += "/META-INF/com.google.*.version"
-            excludes += "/META-INF/kotlinx_*.version"
-            excludes += "kotlin-tooling-metadata.json"
             excludes += "DebugProbesKt.bin"
             excludes += "/META-INF/com/android/build/gradle/app-**.properties"
+        }
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.java.get()))
         }
     }
 }
@@ -103,6 +95,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -110,20 +107,10 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.junit4)
 
-    implementation(libs.androidx.navigation.compose)
-
     implementation(libs.dagger.hilt.android)
-    kapt(libs.dagger.hilt.android.compiler)
-    kapt(libs.dagger.hilt.compiler)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.dagger.hilt.android.compiler)
     implementation(libs.dagger.hilt.navigation)
-
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-
-    implementation(libs.coroutines.core)
-    implementation(libs.coroutines.android)
 
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
@@ -135,9 +122,9 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.messaging.ktx)
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     implementation(libs.google.play.review.ktx)
 }

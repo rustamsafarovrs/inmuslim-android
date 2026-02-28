@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,7 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.R
@@ -112,7 +111,7 @@ fun SettingsScreen(popBackStack: () -> Unit) {
                 title = { Text(text = stringResource(id = R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = { popBackStack.invoke() }) {
-                        Icon(Icons.Filled.ArrowBack, null)
+                        Icon(painterResource(R.drawable.ic_arrow_back_24), null)
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -127,7 +126,7 @@ fun SettingsScreen(popBackStack: () -> Unit) {
                 .fillMaxSize()
         ) {
             SettingItem(
-                icon = Icons.Outlined.LocationOn,
+                icon = ImageVector.vectorResource(R.drawable.ic_location_on_24),
                 title = stringResource(R.string.change_region),
                 desc = stringResource(R.string.change_region_desc),
                 onClick = { regionsBottomSheetState = true }
