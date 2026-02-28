@@ -1,6 +1,5 @@
 package tj.rsdevteam.inmuslim.ui.settings
 
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,10 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import tj.rsdevteam.inmuslim.R
-import tj.rsdevteam.inmuslim.ui.launch.LaunchActivity
+import tj.rsdevteam.inmuslim.core.router.LocalRouter
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
+import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.ui.region.RegionScreen
-import tj.rsdevteam.inmuslim.ui.theme.InmuslimTypography
 import tj.rsdevteam.inmuslim.utils.findActivity
 
 /**
@@ -61,8 +60,8 @@ fun SettingItem(onClick: () -> Unit, icon: ImageVector, title: String, desc: Str
         Icon(imageVector = icon, contentDescription = "title")
         Spacer(modifier = Modifier.width(12.dp))
         Column {
-            Text(text = title, style = InmuslimTypography.titleLarge)
-            Text(text = desc, style = InmuslimTypography.bodyMedium)
+            Text(text = title, style = InmuslimTypo.titleLarge)
+            Text(text = desc, style = InmuslimTypo.bodyMedium)
         }
     }
 }
@@ -83,11 +82,7 @@ fun RegionsBottomSheet(onDismiss: () -> Unit) {
             scope.launch {
                 state.hide()
                 onDismiss.invoke()
-                Intent(context, LaunchActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    context.startActivity(this)
-                }
-                context.findActivity().finish()
+                context.findActivity().recreate()
             }
         }
     }
@@ -95,7 +90,8 @@ fun RegionsBottomSheet(onDismiss: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(popBackStack: () -> Unit) {
+fun SettingsScreen() {
+    val router = LocalRouter.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var regionsBottomSheetState by remember { mutableStateOf(false) }
 
@@ -110,7 +106,7 @@ fun SettingsScreen(popBackStack: () -> Unit) {
             LargeTopAppBar(
                 title = { Text(text = stringResource(id = R.string.settings)) },
                 navigationIcon = {
-                    IconButton(onClick = { popBackStack.invoke() }) {
+                    IconButton(onClick = { router.navigateUp() }) {
                         Icon(painterResource(R.drawable.ic_arrow_back_24), null)
                     }
                 },

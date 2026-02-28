@@ -13,8 +13,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import tj.rsdevteam.inmuslim.config.BuildType
-import tj.rsdevteam.inmuslim.config.BuildVars
+import tj.rsdevteam.inmuslim.core.config.BuildType
+import tj.rsdevteam.inmuslim.core.config.BuildVars
 import tj.rsdevteam.inmuslim.data.api.Api
 import tj.rsdevteam.inmuslim.data.constants.Constants
 import tj.rsdevteam.inmuslim.data.preferences.Preferences

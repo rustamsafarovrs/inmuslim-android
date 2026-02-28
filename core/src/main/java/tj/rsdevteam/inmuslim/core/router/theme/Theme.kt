@@ -1,4 +1,4 @@
-package tj.rsdevteam.inmuslim.ui.theme
+package tj.rsdevteam.inmuslim.core.router.theme
 
 import android.app.Activity
 import android.os.Build
@@ -6,8 +6,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -29,6 +31,7 @@ fun InmuslimTheme(
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
+        @Suppress("DEPRECATION")
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
@@ -38,7 +41,22 @@ fun InmuslimTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = InmuslimTypography,
+        typography = InmuslimTypo,
         content = content
     )
 }
+
+val LightColors = lightColorScheme(
+    primary = Color(0xFF01B6D5),
+    onPrimary = Color(0xFF00C6EA),
+    primaryContainer = Color(0xFFE6F7FF),
+    onPrimaryContainer = Color(0xFF0091B6),
+    secondary = Color(0xFF53D9F9),
+    onSecondary = Color(0xFFE0FFFB),
+    secondaryContainer = Color(0xFFD8F2FF),
+    onSecondaryContainer = Color(0xFFB3E5FC),
+    tertiary = Color(0xFFD8F2FF),
+    onTertiary = Color(0xFFE0FFFB),
+    tertiaryContainer = Color(0xFFD3F7FF),
+    onTertiaryContainer = Color(0xFFB3E5FC),
+)

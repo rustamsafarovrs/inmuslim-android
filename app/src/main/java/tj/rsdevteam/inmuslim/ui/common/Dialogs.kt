@@ -16,9 +16,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import tj.rsdevteam.inmuslim.R
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimShapes
 import tj.rsdevteam.inmuslim.data.models.DialogState
-import tj.rsdevteam.inmuslim.ui.theme.InmuslimShapes
+import tj.rsdevteam.inmuslim.res.R
 
 /**
  * Created by Rustam Safarov on 8/13/23.
@@ -32,7 +32,7 @@ fun DialogContent() {
             .size(100.dp)
             .background(
                 color = Color.White,
-                shape =InmuslimShapes.large
+                shape = InmuslimShapes.large
             )
     ) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

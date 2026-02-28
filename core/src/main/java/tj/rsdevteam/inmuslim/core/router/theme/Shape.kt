@@ -1,4 +1,4 @@
-package tj.rsdevteam.inmuslim.ui.theme
+package tj.rsdevteam.inmuslim.core.router.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes

@@ -1,7 +1,7 @@
 package tj.rsdevteam.inmuslim.core.router
 
 import androidx.compose.runtime.compositionLocalOf
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.toRoute
 
 /**
@@ -9,7 +9,7 @@ import androidx.navigation.toRoute
  * github.com/rustamsafarovrs
  */
 
-class Router(val controller: NavController) {
+class Router(val controller: NavHostController) {
 
     fun navigate(route: Screen) {
         controller.navigate(route = route)

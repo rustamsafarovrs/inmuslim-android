@@ -21,12 +21,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import tj.rsdevteam.inmuslim.R
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Region
+import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.ui.common.ErrorDialog
 import tj.rsdevteam.inmuslim.ui.common.PrimaryButton
 import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
-import tj.rsdevteam.inmuslim.ui.theme.InmuslimTypography
 
 /**
  * Created by Rustam Safarov on 14/08/23.
@@ -45,7 +45,7 @@ fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region)
                     .padding(horizontal = 20.dp)
                     .defaultMinSize(minHeight = 50.dp)
             ) {
-                Text(text = region.name, style = InmuslimTypography.labelLarge)
+                Text(text = region.name, style = InmuslimTypo.labelLarge)
                 Spacer(modifier = Modifier.weight(1f))
                 if (region.selected.value) {
                     Icon(painterResource(R.drawable.ic_check_24), contentDescription = null)
@@ -69,7 +69,7 @@ fun RegionScreen(viewModel: RegionViewModel = hiltViewModel(), onSelected: () ->
             Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = stringResource(R.string.select_region_title),
-                style = InmuslimTypography.titleLarge,
+                style = InmuslimTypo.titleLarge,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
             Spacer(modifier = Modifier.height(20.dp))

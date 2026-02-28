@@ -19,3 +19,4 @@ dependencyResolutionManagement {
 rootProject.name = "inmuslim-android"
 include(":app")
 include(":core")
+include(":res")

@@ -51,13 +51,11 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
-            buildConfigField("String", "BASE_URL", "\"https://rsdevteam.ru/inmuslim/api/\"")
         }
         debug {
             isDebuggable = true
             applicationIdSuffix = ".beta"
             signingConfig = signingConfigs.getByName("debug")
-            buildConfigField("String", "BASE_URL", "\"https://rsdevteam.ru/inmuslim/api/\"")
         }
     }
     compileOptions {
@@ -86,7 +84,6 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -127,4 +124,6 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 
     implementation(libs.google.play.review.ktx)
+    implementation(project(":core"))
+    implementation(project(":res"))
 }

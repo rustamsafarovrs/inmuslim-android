@@ -1,6 +1,6 @@
-package tj.rsdevteam.inmuslim.config
+package tj.rsdevteam.inmuslim.core.config
 
-import tj.rsdevteam.inmuslim.BuildConfig
+import tj.rsdevteam.inmuslim.core.BuildConfig
 
 /**
  * Created by Rustam Safarov on 8/13/23.

@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import tj.rsdevteam.inmuslim.ui.theme.InmuslimTypography
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 
 /**
  * Created by Rustam Safarov on 8/13/23.
@@ -30,7 +30,7 @@ fun PrimaryButton(text: String, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
     ) {
-        Text(text = text, style = InmuslimTypography.titleMedium)
+        Text(text = text, style = InmuslimTypo.titleMedium)
     }
 }
 
