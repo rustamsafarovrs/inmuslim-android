@@ -78,7 +78,7 @@ fun RegionsBottomSheet(onDismiss: () -> Unit) {
         sheetState = state,
         dragHandle = { BottomSheetDefaults.DragHandle() }
     ) {
-        RegionScreen {
+        RegionScreen(isBottomSheet = true) {
             scope.launch {
                 state.hide()
                 onDismiss.invoke()

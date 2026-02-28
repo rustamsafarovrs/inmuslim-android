@@ -56,12 +56,16 @@ fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region)
 }
 
 @Composable
-fun RegionScreen(viewModel: RegionViewModel = hiltViewModel(), onSelected: () -> Unit) {
+fun RegionScreen(
+    viewModel: RegionViewModel = hiltViewModel(),
+    isBottomSheet: Boolean = false,
+    onSelected: () -> Unit
+) {
     ErrorDialog(dialogState = viewModel.dialogState.value)
     Column(
         modifier = Modifier
-            .navigationBarsPadding()
-            .statusBarsPadding()
+            .then(if (isBottomSheet) Modifier else Modifier.navigationBarsPadding())
+            .then(if (isBottomSheet) Modifier else Modifier.statusBarsPadding())
     ) {
         if (viewModel.showLoading.value) {
             ProgressIndicator()
@@ -75,7 +79,7 @@ fun RegionScreen(viewModel: RegionViewModel = hiltViewModel(), onSelected: () ->
             Spacer(modifier = Modifier.height(20.dp))
             Regions(
                 viewModel.list.value,
-                modifier = Modifier.weight(1f, fill = false),
+                modifier = Modifier.weight(1f),
             ) {
                 viewModel.onRegionSelected(it)
             }
