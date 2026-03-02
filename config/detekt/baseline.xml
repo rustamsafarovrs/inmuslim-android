@@ -1,6 +1,9 @@
-<?xml version="1.0" ?>
+<?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
-  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <ManuallySuppressedIssues>
+    <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen()</ID>
+    <ID>MagicNumber:SettingsScreen.kt$180f</ID>
+  </ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ArgumentListWrapping:HomeScreens.kt$( title = { Text(text = stringResource(id = R.string.app_name)) }, actions = { IconButton(onClick = { navigateToSettings.invoke() }) { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") } })</ID>
     <ID>ArgumentListWrapping:Type.kt$( fontSize = 11.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp, fontWeight = FontWeight.Medium )</ID>

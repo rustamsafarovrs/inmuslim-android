@@ -11,4 +11,8 @@
     <string name="change_region">Изменить регион</string>
     <string name="change_region_desc">Сменить регион в другой</string>
     <string name="select_region_title">Выберите регион или город</string>
+    <string name="timing_source">Время молитв взято с сайта shuroiulamo.tj</string>
+    <string name="change_language">Изменить язык</string>
+    <string name="change_language_desc">Выбрать язык приложения</string>
+    <string name="general">Общие</string>
 </resources>

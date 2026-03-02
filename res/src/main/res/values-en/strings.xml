@@ -11,4 +11,8 @@
     <string name="change_region">Change region</string>
     <string name="change_region_desc">Change to another region</string>
     <string name="select_region_title">Select region or city</string>
+    <string name="timing_source">Prayer timings are taken from shuroiulamo.tj</string>
+    <string name="change_language">Change language</string>
+    <string name="change_language_desc">Select app language</string>
+    <string name="general">General</string>
 </resources>

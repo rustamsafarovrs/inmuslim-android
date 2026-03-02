@@ -12,4 +12,8 @@
     <string name="change_region">Тағйир додани минтақа</string>
     <string name="change_region_desc">Ба минтақаи дигар иваз намудан</string>
     <string name="select_region_title">Минтақа ё шаҳрро интихоб кунед</string>
+    <string name="timing_source">Вақтҳои намоз аз сомонаи shuroiulamo.tj гирифта шудаанд</string>
+    <string name="change_language">Тағйири забон</string>
+    <string name="change_language_desc">Интихоби забони барнома</string>
+    <string name="general">Умумӣ</string>
 </resources>
