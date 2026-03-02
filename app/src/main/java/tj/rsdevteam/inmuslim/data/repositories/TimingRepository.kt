@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.flow
 import tj.rsdevteam.inmuslim.data.api.Api
 import tj.rsdevteam.inmuslim.data.models.Resource
 import tj.rsdevteam.inmuslim.data.models.Timing
-import tj.rsdevteam.inmuslim.data.models.api.GetTimingBodyDTO
 import tj.rsdevteam.inmuslim.data.preferences.Preferences
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +24,7 @@ class TimingRepository
 
     fun getTiming(): Flow<Resource<Timing>> = flow {
         emit(Resource.InProgress())
-        val result = api.getTiming(GetTimingBodyDTO(regionId = preferences.getRegionId()))
+        val result = api.getTiming(regionId = preferences.getRegionId())
         if (result.isSuccess && result.getOrNull()?.result == 0) {
             emit(Resource.Success(result.getOrThrow().timing.toTiming()))
         } else {
