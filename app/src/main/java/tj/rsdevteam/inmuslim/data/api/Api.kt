@@ -18,15 +18,15 @@ import tj.rsdevteam.inmuslim.data.models.api.UpdateMessagingIdDTO
 
 interface Api {
 
-    @GET("api/region/get-regions")
+    @GET("region/get-regions")
     suspend fun getRegions(): Result<GetRegionsDTO>
 
-    @GET("api/timing/get-timing")
+    @GET("timing/get-timing")
     suspend fun getTiming(@Query("regionId") regionId: Long): Result<GetTimingDTO>
 
-    @POST("api/user/register-user")
+    @POST("user/register-user")
     suspend fun registerUser(@Body body: RegisterUserBodyDTO): Result<RegisterUserDTO>
 
-    @POST("api/messaging/update-messaging-id")
+    @POST("messaging/update-messaging-id")
     suspend fun updateMessagingId(@Body body: UpdateMessagingIdBodyDTO): Result<UpdateMessagingIdDTO>
 }
