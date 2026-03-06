@@ -5,15 +5,13 @@
   * Current prayer time feature.
   * Enhance SettingsScreen with language change.
 * Updates:
-  * Improved state management for all screens (918418c).
+  * Improved state management for all screens.
   * New API routes.
   * ErrorBottomSheet component and VM refactor.
 * Health:
   * Update Gradle and AGP versions.
   * Update google services config file.
   * Init project with core and update dependencies.
-
-
 
 1.0.3
 -----
