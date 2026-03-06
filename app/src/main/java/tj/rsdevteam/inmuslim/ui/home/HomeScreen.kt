@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,7 +35,7 @@ import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Timing
 import tj.rsdevteam.inmuslim.res.R
-import tj.rsdevteam.inmuslim.ui.common.ErrorDialog
+import tj.rsdevteam.inmuslim.ui.common.ErrorBottomSheet
 import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
 import tj.rsdevteam.inmuslim.utils.findActivity
 import tj.rsdevteam.inmuslim.utils.launchInAppReview
@@ -55,7 +57,7 @@ fun TimeItem(title: String, start: String) {
     ) {
         Text(text = title, style = InmuslimTypo.titleMedium)
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = start, style = InmuslimTypo.titleSmall)
+        Text(text = start, style = InmuslimTypo.titleSmall.copy(fontWeight = FontWeight.SemiBold))
     }
 }
 
@@ -66,10 +68,11 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val router = LocalRouter.current
+    val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(key1 = Unit) {
-        if (!viewModel.isReviewShown) {
-            context.findActivity().launchInAppReview { viewModel.reviewShowed() }
+        if (!viewModel.state.isReviewShown) {
+            context.findActivity().launchInAppReview { viewModel.handleEvent(HomeUIEvent.ReviewShowed) }
         }
     }
 
@@ -85,8 +88,7 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        ErrorDialog(viewModel.dialogState.value)
-        if (viewModel.showLoading.value) {
+        if (viewModel.state.showLoading) {
             ProgressIndicator()
         }
         Column(
@@ -95,11 +97,19 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp)
                 .fillMaxSize()
         ) {
-            if (viewModel.timing.value != null) {
-                val timing = viewModel.timing.value!!
+            if (viewModel.state.timing != null) {
+                val timing = viewModel.state.timing!!
                 TimeItems(timing)
             }
         }
+    }
+
+    if (viewModel.state.errorBottomSheetConfig != null) {
+        ErrorBottomSheet(
+            sheetState = errorState,
+            errorBottomSheetConfig = viewModel.state.errorBottomSheetConfig!!,
+            dismiss = { viewModel.handleEvent(HomeUIEvent.DismissDialog) }
+        )
     }
 }
 

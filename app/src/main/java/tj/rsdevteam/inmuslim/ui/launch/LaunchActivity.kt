@@ -27,25 +27,12 @@ class LaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        observe()
-    }
-
-    private fun observe() {
         lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.openMain.collect {
-                        if (it) {
-                            openMain(false)
-                            finish()
-                        }
-                    }
-                }
-
-                launch {
-                    viewModel.openOnboarding.collect {
-                        if (it) {
-                            openMain(true)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is LaunchVMEvent.OpenMain -> {
+                            openMain(event.openOnboarding)
                             finish()
                         }
                     }

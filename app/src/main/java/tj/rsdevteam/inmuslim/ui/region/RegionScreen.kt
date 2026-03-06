@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.res.R
-import tj.rsdevteam.inmuslim.ui.common.ErrorDialog
+import tj.rsdevteam.inmuslim.ui.common.ErrorBottomSheet
 import tj.rsdevteam.inmuslim.ui.common.PrimaryButton
 import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
 
@@ -55,19 +57,21 @@ fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegionScreen(
     viewModel: RegionViewModel = hiltViewModel(),
     isBottomSheet: Boolean = false,
     onSelected: () -> Unit
 ) {
-    ErrorDialog(dialogState = viewModel.dialogState.value)
+    val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     Column(
         modifier = Modifier
             .then(if (isBottomSheet) Modifier else Modifier.navigationBarsPadding())
             .then(if (isBottomSheet) Modifier else Modifier.statusBarsPadding())
     ) {
-        if (viewModel.showLoading.value) {
+        if (viewModel.state.showLoading) {
             ProgressIndicator()
         } else {
             Spacer(modifier = Modifier.height(30.dp))
@@ -78,17 +82,25 @@ fun RegionScreen(
             )
             Spacer(modifier = Modifier.height(20.dp))
             Regions(
-                viewModel.list.value,
+                viewModel.state.list,
                 modifier = Modifier.weight(1f),
             ) {
-                viewModel.onRegionSelected(it)
+                viewModel.handleEvent(RegionUIEvent.DidSelectRegion(it))
             }
             Spacer(modifier = Modifier.height(12.dp))
             PrimaryButton(text = "OK") {
-                viewModel.onConfirmBtnClick()
+                viewModel.handleEvent(RegionUIEvent.DidClickConfirm)
                 onSelected.invoke()
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+
+    if (viewModel.state.sheetConfig != null) {
+        ErrorBottomSheet(
+            sheetState = errorState,
+            errorBottomSheetConfig = viewModel.state.sheetConfig!!,
+            dismiss = { viewModel.handleEvent(RegionUIEvent.DismissDialog) }
+        )
     }
 }

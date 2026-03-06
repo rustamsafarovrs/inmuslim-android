@@ -16,4 +16,5 @@
     <string name="change_language">Тағйири забон</string>
     <string name="change_language_desc">Интихоби забони барнома</string>
     <string name="general">Умумӣ</string>
+    <string name="error_title">Хатогӣ</string>
 </resources>

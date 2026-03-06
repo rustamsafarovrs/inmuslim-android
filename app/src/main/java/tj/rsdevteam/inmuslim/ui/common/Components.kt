@@ -21,12 +21,12 @@ import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
  */
 
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit) {
+fun PrimaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     androidx.compose.material3.Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
     ) {
