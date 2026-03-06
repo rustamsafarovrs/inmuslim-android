@@ -46,11 +46,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.core.router.LocalRouter
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimShapes
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.ui.region.RegionScreen
@@ -63,7 +65,7 @@ import tj.rsdevteam.inmuslim.utils.findActivity
  */
 
 @Composable
-fun SettingItem(
+private fun SettingItem(
     onClick: () -> Unit,
     icon: ImageVector,
     title: String,
@@ -131,7 +133,7 @@ fun SettingItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegionsBottomSheet(onDismiss: () -> Unit) {
+private fun RegionsBottomSheet(onDismiss: () -> Unit) {
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -151,19 +153,33 @@ fun RegionsBottomSheet(onDismiss: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
-    val context = LocalContext.current
     val router = LocalRouter.current
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val context = LocalContext.current
     var regionsBottomSheetState by remember { mutableStateOf(false) }
+
+    SettingsScreen(
+        onBackClick = { router.navigateUp() },
+        onRegionClick = { regionsBottomSheetState = true },
+        onLanguageClick = { Utils.openLanguageSettings(context) }
+    )
 
     if (regionsBottomSheetState) {
         RegionsBottomSheet {
             regionsBottomSheetState = false
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsScreen(
+    onBackClick: () -> Unit,
+    onRegionClick: () -> Unit,
+    onLanguageClick: () -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         topBar = {
@@ -175,7 +191,7 @@ fun SettingsScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { router.navigateUp() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             painterResource(R.drawable.ic_arrow_back_24),
                             contentDescription = "Back",
@@ -225,14 +241,14 @@ fun SettingsScreen() {
                         icon = ImageVector.vectorResource(R.drawable.ic_location_on_24),
                         title = stringResource(R.string.change_region),
                         desc = stringResource(R.string.change_region_desc),
-                        onClick = { regionsBottomSheetState = true },
+                        onClick = onRegionClick,
                         showDivider = true
                     )
                     SettingItem(
                         icon = ImageVector.vectorResource(R.drawable.ic_dictionary_24),
                         title = stringResource(R.string.change_language),
                         desc = stringResource(R.string.change_language_desc),
-                        onClick = { Utils.openLanguageSettings(context) }
+                        onClick = onLanguageClick
                     )
                 }
             }
@@ -281,5 +297,17 @@ fun SettingsScreen() {
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsScreenPreview() {
+    InmuslimTheme {
+        SettingsScreen(
+            onBackClick = {},
+            onRegionClick = {},
+            onLanguageClick = {}
+        )
     }
 }

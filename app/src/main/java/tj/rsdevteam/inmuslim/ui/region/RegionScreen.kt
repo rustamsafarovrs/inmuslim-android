@@ -21,8 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import tj.rsdevteam.inmuslim.core.router.LocalRouter
+import tj.rsdevteam.inmuslim.core.router.Screen
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.res.R
@@ -36,7 +40,7 @@ import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
  */
 
 @Composable
-fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region) -> Unit) {
+private fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region) -> Unit) {
     LazyColumn(modifier = modifier) {
         items(list) { region ->
             Row(
@@ -57,11 +61,34 @@ fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegionScreen() {
+    val router = LocalRouter.current
+    RegionScreen(isBottomSheet = false) {
+        router.navigateAsRoot(Screen.Main)
+    }
+}
+
 @Composable
 fun RegionScreen(
-    viewModel: RegionViewModel = hiltViewModel(),
-    isBottomSheet: Boolean = false,
+    isBottomSheet: Boolean,
+    onSelected: () -> Unit
+) {
+    val viewModel: RegionViewModel = hiltViewModel()
+    RegionScreen(
+        state = viewModel.state,
+        isBottomSheet = isBottomSheet,
+        handleEvent = { viewModel.handleEvent(it) },
+        onSelected = onSelected
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RegionScreen(
+    state: RegionScreenState,
+    isBottomSheet: Boolean,
+    handleEvent: (RegionUIEvent) -> Unit,
     onSelected: () -> Unit
 ) {
     val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -71,7 +98,7 @@ fun RegionScreen(
             .then(if (isBottomSheet) Modifier else Modifier.navigationBarsPadding())
             .then(if (isBottomSheet) Modifier else Modifier.statusBarsPadding())
     ) {
-        if (viewModel.state.showLoading) {
+        if (state.showLoading) {
             ProgressIndicator()
         } else {
             Spacer(modifier = Modifier.height(30.dp))
@@ -82,25 +109,44 @@ fun RegionScreen(
             )
             Spacer(modifier = Modifier.height(20.dp))
             Regions(
-                viewModel.state.list,
+                state.list,
                 modifier = Modifier.weight(1f),
             ) {
-                viewModel.handleEvent(RegionUIEvent.DidSelectRegion(it))
+                handleEvent(RegionUIEvent.DidSelectRegion(it))
             }
             Spacer(modifier = Modifier.height(12.dp))
             PrimaryButton(text = "OK") {
-                viewModel.handleEvent(RegionUIEvent.DidClickConfirm)
+                handleEvent(RegionUIEvent.DidClickConfirm)
                 onSelected.invoke()
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
 
-    if (viewModel.state.sheetConfig != null) {
+    if (state.sheetConfig != null) {
         ErrorBottomSheet(
             sheetState = errorState,
-            errorBottomSheetConfig = viewModel.state.sheetConfig!!,
-            dismiss = { viewModel.handleEvent(RegionUIEvent.DismissDialog) }
+            errorBottomSheetConfig = state.sheetConfig!!,
+            dismiss = { handleEvent(RegionUIEvent.DismissDialog) }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegionScreenPreview() {
+    InmuslimTheme {
+        RegionScreen(
+            state = RegionScreenState(
+                list = listOf(
+                    Region(0, "Dushanbe"),
+                    Region(1, "Khujand"),
+                    Region(2, "Bokhtar")
+                )
+            ),
+            isBottomSheet = false,
+            handleEvent = {},
+            onSelected = {}
         )
     }
 }

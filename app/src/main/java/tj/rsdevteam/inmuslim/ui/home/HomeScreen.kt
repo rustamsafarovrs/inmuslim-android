@@ -52,7 +52,7 @@ import tj.rsdevteam.inmuslim.utils.launchInAppReview
  */
 
 @Composable
-fun TimeItem(title: String, start: String, isSelected: Boolean = false) {
+private fun TimeItem(title: String, start: String, isSelected: Boolean = false) {
     val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.secondaryContainer
     } else {
@@ -86,14 +86,11 @@ fun TimeItem(title: String, start: String, isSelected: Boolean = false) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
-) {
+fun HomeScreen() {
+    val viewModel: HomeViewModel = hiltViewModel()
     val context = LocalContext.current
     val router = LocalRouter.current
-    val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(key1 = Unit) {
         if (!viewModel.state.isReviewShown) {
@@ -101,12 +98,28 @@ fun HomeScreen(
         }
     }
 
+    HomeScreen(
+        state = viewModel.state,
+        onSettingsClick = { router.navigate(Screen.Settings) },
+        handleEvent = { viewModel.handleEvent(it) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreen(
+    state: HomeScreenState,
+    onSettingsClick: () -> Unit,
+    handleEvent: (HomeUIEvent) -> Unit
+) {
+    val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
-                    IconButton(onClick = { router.navigate(Screen.Settings) }) {
+                    IconButton(onClick = onSettingsClick) {
                         Icon(painterResource(R.drawable.ic_settings_24), contentDescription = "Settings")
                     }
                 }
@@ -114,7 +127,7 @@ fun HomeScreen(
         }
     ) { paddingValues ->
         val scrollState = rememberScrollState()
-        if (viewModel.state.showLoading) {
+        if (state.showLoading) {
             ProgressIndicator()
         }
         Column(
@@ -124,30 +137,30 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-            if (viewModel.state.timing != null) {
-                val timing = viewModel.state.timing!!
+            if (state.timing != null) {
+                val timing = state.timing!!
                 Spacer(modifier = Modifier.height(20.dp))
-                viewModel.state.currentPrayer?.let {
+                state.currentPrayer?.let {
                     CurrentPrayerCard(it)
                     Spacer(modifier = Modifier.height(20.dp))
                 }
-                TimeItems(timing, viewModel.state.currentPrayer?.nameResId)
+                TimeItems(timing, state.currentPrayer?.nameResId)
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
 
-    if (viewModel.state.errorBottomSheetConfig != null) {
+    if (state.errorBottomSheetConfig != null) {
         ErrorBottomSheet(
             sheetState = errorState,
-            errorBottomSheetConfig = viewModel.state.errorBottomSheetConfig!!,
-            dismiss = { viewModel.handleEvent(HomeUIEvent.DismissDialog) }
+            errorBottomSheetConfig = state.errorBottomSheetConfig!!,
+            dismiss = { handleEvent(HomeUIEvent.DismissDialog) }
         )
     }
 }
 
 @Composable
-fun CurrentPrayerCard(activePrayer: ActivePrayer) {
+private fun CurrentPrayerCard(activePrayer: ActivePrayer) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,6 +248,35 @@ private fun TimeItems(timing: Timing, currentPrayerResId: Int?) {
             title = stringResource(R.string.isha),
             start = timing.isha,
             isSelected = currentPrayerResId == R.string.isha
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenPreview() {
+    InmuslimTheme {
+        HomeScreen(
+            state = HomeScreenState(
+                timing = Timing(
+                    fajr = "05:00",
+                    sunrise = "06:30",
+                    zuhr = "12:30",
+                    asr = "16:00",
+                    sunset = "18:30",
+                    maghrib = "18:45",
+                    isha = "20:00"
+                ),
+                currentPrayer = ActivePrayer(
+                    nameResId = R.string.zuhr,
+                    time = "12:30",
+                    startTime = "12:30",
+                    endTime = "16:00",
+                    progress = 0.5f
+                )
+            ),
+            onSettingsClick = {},
+            handleEvent = {}
         )
     }
 }

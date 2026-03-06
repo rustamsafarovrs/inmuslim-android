@@ -54,9 +54,7 @@ fun Navigation(startDestination: Screen) {
     val router = LocalRouter.current
     NavHost(navController = router.controller, startDestination = startDestination) {
         composable<Screen.Regions> {
-            RegionScreen {
-                router.navigateAsRoot(Screen.Main)
-            }
+            RegionScreen()
         }
         composable<Screen.Main> {
             HomeScreen()
