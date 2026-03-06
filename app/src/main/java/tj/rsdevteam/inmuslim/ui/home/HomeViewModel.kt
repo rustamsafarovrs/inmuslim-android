@@ -11,6 +11,8 @@ import tj.rsdevteam.inmuslim.data.models.ErrorBottomSheetConfig
 import tj.rsdevteam.inmuslim.data.models.Resource
 import tj.rsdevteam.inmuslim.data.repositories.TimingRepository
 import tj.rsdevteam.inmuslim.data.repositories.UserRepository
+import tj.rsdevteam.inmuslim.res.R
+import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.Utils
 import javax.inject.Inject
 
@@ -45,7 +47,10 @@ class HomeViewModel
                 .collect { rs ->
                     when (rs) {
                         is Resource.InProgress -> Unit
-                        is Resource.Success -> state = state.copy(timing = rs.data)
+                        is Resource.Success -> {
+                            state = state.copy(timing = rs.data)
+                            calculateCurrentPrayer()
+                        }
                         is Resource.Error -> {
                             state = state.copy(
                                 errorBottomSheetConfig = ErrorBottomSheetConfig(
@@ -108,5 +113,42 @@ class HomeViewModel
 
     fun dismissDialog() {
         state = state.copy(errorBottomSheetConfig = null)
+    }
+
+    private fun calculateCurrentPrayer() {
+        val timing = state.timing ?: return
+        val now = TimeUtils.getCurrentTimeInMinutes()
+
+        val info = TimeUtils.findCurrentPrayer(
+            timing = timing,
+            now = now,
+            fajrResId = R.string.fajr,
+            zuhrResId = R.string.zuhr,
+            asrResId = R.string.asr,
+            maghribResId = R.string.maghrib,
+            ishaResId = R.string.isha
+        )
+
+        val currentPrayer = info?.let {
+            val total = if (it.endInMinutes > it.startInMinutes) {
+                it.endInMinutes - it.startInMinutes
+            } else {
+                (it.endInMinutes + 24 * 60) - it.startInMinutes
+            }
+            val currentNow = if (now < it.startInMinutes && it.endInMinutes <= it.startInMinutes) {
+                now + 24 * 60
+            } else {
+                now
+            }
+            val progress = (currentNow - it.startInMinutes).toFloat() / total
+            ActivePrayer(
+                nameResId = it.nameResId,
+                time = it.startTime,
+                startTime = it.startTime,
+                endTime = it.endTime,
+                progress = progress.coerceIn(0f, 1f)
+            )
+        }
+        state = state.copy(currentPrayer = currentPrayer)
     }
 }

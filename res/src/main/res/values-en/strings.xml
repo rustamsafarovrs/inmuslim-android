@@ -16,4 +16,5 @@
     <string name="change_language_desc">Select app language</string>
     <string name="general">General</string>
     <string name="error_title">Error</string>
+    <string name="current_prayer_time">Current prayer time</string>
 </resources>

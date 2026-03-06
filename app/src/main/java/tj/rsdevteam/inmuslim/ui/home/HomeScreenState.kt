@@ -7,5 +7,14 @@ data class HomeScreenState(
     val errorBottomSheetConfig: ErrorBottomSheetConfig? = null,
     val showLoading: Boolean = false,
     val timing: Timing? = null,
-    val isReviewShown: Boolean = false
+    val isReviewShown: Boolean = false,
+    val currentPrayer: ActivePrayer? = null
+)
+
+data class ActivePrayer(
+    val nameResId: Int,
+    val time: String,
+    val startTime: String,
+    val endTime: String,
+    val progress: Float
 )

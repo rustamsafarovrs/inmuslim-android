@@ -16,4 +16,5 @@
     <string name="change_language_desc">Выбрать язык приложения</string>
     <string name="general">Общие</string>
     <string name="error_title">Ошибка</string>
+    <string name="current_prayer_time">Текущее время молитвы</string>
 </resources>
