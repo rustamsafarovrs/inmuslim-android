@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import tj.rsdevteam.inmuslim.ui.theme.InmuslimTypography
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 
 /**
  * Created by Rustam Safarov on 8/13/23.
@@ -21,16 +21,16 @@ import tj.rsdevteam.inmuslim.ui.theme.InmuslimTypography
  */
 
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit) {
+fun PrimaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     androidx.compose.material3.Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
     ) {
-        Text(text = text, style = InmuslimTypography.titleMedium)
+        Text(text = text, style = InmuslimTypo.titleMedium)
     }
 }
 

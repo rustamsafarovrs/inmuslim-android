@@ -1,6 +1,17 @@
-<?xml version="1.0" ?>
+<?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
-  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <ManuallySuppressedIssues>
+    <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen()</ID>
+    <ID>MagicNumber:SettingsScreen.kt$180f</ID>
+    <ID>MagicNumber:TimeUtils.kt$TimeUtils$60</ID>
+    <ID>LongParameterList:TimeUtils.kt$TimeUtils$( timing: Timing, now: Int, fajrResId: Int, zuhrResId: Int, asrResId: Int, maghribResId: Int, ishaResId: Int )</ID>
+    <ID>MagicNumber:TimeUtils.kt$TimeUtils$24</ID>
+    <ID>MagicNumber:TimeUtils.kt$TimeUtils$40</ID>
+    <ID>MagicNumber:TimeUtils.kt$TimeUtils$39</ID>
+    <ID>MagicNumber:HomeViewModel.kt$HomeViewModel$60</ID>
+    <ID>MagicNumber:HomeViewModel.kt$HomeViewModel$24</ID>
+    <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun SettingsScreen( onBackClick: () -> Unit, onRegionClick: () -> Unit, onLanguageClick: () -> Unit )</ID>
+  </ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ArgumentListWrapping:HomeScreens.kt$( title = { Text(text = stringResource(id = R.string.app_name)) }, actions = { IconButton(onClick = { navigateToSettings.invoke() }) { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") } })</ID>
     <ID>ArgumentListWrapping:Type.kt$( fontSize = 11.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp, fontWeight = FontWeight.Medium )</ID>

@@ -1,9 +1,11 @@
 package tj.rsdevteam.inmuslim.ui.launch
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.data.repositories.RegionRepository
 import javax.inject.Inject
 
@@ -18,17 +20,28 @@ class LaunchViewModel
     private val regionRepository: RegionRepository
 ) : ViewModel() {
 
-    private val _openMain = MutableStateFlow(false)
-    val openMain = _openMain.asStateFlow()
-
-    private val _openOnboarding = MutableStateFlow(false)
-    val openOnboarding = _openOnboarding.asStateFlow()
+    private val _event = Channel<LaunchVMEvent>()
+    val event = _event.receiveAsFlow()
 
     init {
-        if (regionRepository.getRegionId() > 0) {
-            _openMain.value = true
-        } else {
-            _openOnboarding.value = true
+        handleEvent(LaunchUIEvent.Init)
+    }
+
+    fun handleEvent(event: LaunchUIEvent) {
+        when (event) {
+            is LaunchUIEvent.Init -> {
+                checkRegion()
+            }
+        }
+    }
+
+    private fun checkRegion() {
+        viewModelScope.launch {
+            if (regionRepository.getRegionId() > 0) {
+                _event.send(LaunchVMEvent.OpenMain(false))
+            } else {
+                _event.send(LaunchVMEvent.OpenMain(true))
+            }
         }
     }
 }

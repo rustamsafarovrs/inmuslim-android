@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.core.Const
 import tj.rsdevteam.inmuslim.ui.MainActivity
-import tj.rsdevteam.inmuslim.ui.OnboardingActivity
 
 /**
  * Created by Rustam Safarov on 8/20/23.
@@ -27,25 +27,12 @@ class LaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        observe()
-    }
-
-    private fun observe() {
         lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.openMain.collect {
-                        if (it) {
-                            openMain()
-                            finish()
-                        }
-                    }
-                }
-
-                launch {
-                    viewModel.openOnboarding.collect {
-                        if (it) {
-                            openOnboarding()
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is LaunchVMEvent.OpenMain -> {
+                            openMain(event.openOnboarding)
                             finish()
                         }
                     }
@@ -54,16 +41,10 @@ class LaunchActivity : ComponentActivity() {
         }
     }
 
-    private fun openMain() {
+    private fun openMain(openOnboarding: Boolean) {
         Intent(this@LaunchActivity, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(this)
-        }
-    }
-
-    private fun openOnboarding() {
-        Intent(this@LaunchActivity, OnboardingActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            putExtra(Const.OPEN_ONBOARDING, openOnboarding)
             startActivity(this)
         }
     }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">Settings</string>
+    <string name="fajr">Fajr</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="zuhr">Zuhr</string>
+    <string name="asr">Asr</string>
+    <string name="sunset">Sunset</string>
+    <string name="maghrib">Maghrib</string>
+    <string name="isha">"Isha "</string>
+    <string name="change_region">Change region</string>
+    <string name="change_region_desc">Change to another region</string>
+    <string name="select_region_title">Select region or city</string>
+    <string name="timing_source">Prayer timings are taken from shuroiulamo.tj</string>
+    <string name="change_language">Change language</string>
+    <string name="change_language_desc">Select app language</string>
+    <string name="general">General</string>
+    <string name="error_title">Error</string>
+    <string name="current_prayer_time">Current prayer time</string>
+</resources>

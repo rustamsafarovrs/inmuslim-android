@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name" translatable="false">Inmuslim</string>
+    <string name="default_notification_channel_id" translatable="false">Push-notifications</string>
+    <string name="settings">Танзимот</string>
+    <string name="fajr">Бомдод</string>
+    <string name="sunrise">Тулӯи офтоб</string>
+    <string name="zuhr">Пешин</string>
+    <string name="asr">Аср</string>
+    <string name="sunset">Ғуруби офтоб</string>
+    <string name="maghrib">Шом</string>
+    <string name="isha">Хуфтан</string>
+    <string name="change_region">Тағйир додани минтақа</string>
+    <string name="change_region_desc">Ба минтақаи дигар иваз намудан</string>
+    <string name="select_region_title">Минтақа ё шаҳрро интихоб кунед</string>
+    <string name="timing_source">Вақтҳои намоз аз сомонаи shuroiulamo.tj гирифта шудаанд</string>
+    <string name="change_language">Тағйири забон</string>
+    <string name="change_language_desc">Интихоби забони барнома</string>
+    <string name="general">Умумӣ</string>
+    <string name="error_title">Хатогӣ</string>
+    <string name="current_prayer_time">Вақти намози ҷорӣ</string>
+</resources>

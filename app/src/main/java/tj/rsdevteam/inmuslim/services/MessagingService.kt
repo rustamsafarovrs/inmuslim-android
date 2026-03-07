@@ -15,9 +15,10 @@ import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import tj.rsdevteam.inmuslim.ui.MainActivity
-import tj.rsdevteam.inmuslim.R
+import tj.rsdevteam.inmuslim.core.Const
 import tj.rsdevteam.inmuslim.data.preferences.Preferences
+import tj.rsdevteam.inmuslim.res.R
+import tj.rsdevteam.inmuslim.ui.MainActivity
 import java.io.IOException
 import javax.inject.Inject
 
@@ -28,9 +29,9 @@ class MessagingService : FirebaseMessagingService() {
     lateinit var preferences: Preferences
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        if (remoteMessage.notification != null
-            && remoteMessage.notification!!.title != null
-            && remoteMessage.notification!!.body != null
+        if (remoteMessage.notification != null &&
+            remoteMessage.notification!!.title != null &&
+            remoteMessage.notification!!.body != null
         ) {
             sendNotification(
                 remoteMessage.notification!!.title!!,
@@ -52,7 +53,7 @@ class MessagingService : FirebaseMessagingService() {
 
         val channelId = getString(R.string.default_notification_channel_id)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(tj.rsdevteam.inmuslim.R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
@@ -88,12 +89,12 @@ class MessagingService : FirebaseMessagingService() {
 
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
-                return BitmapFactory.decodeStream(response.body!!.byteStream())
+                return BitmapFactory.decodeStream(response.body.byteStream())
             } else {
-                Log.e(TAG, "Error in getting notification image, code=" + response.code)
+                Log.e(Const.LOGCAT, "Error in getting notification image, code=" + response.code)
             }
         } catch (e: IOException) {
-            Log.e(TAG, "Error in getting notification image, message=" + e.message)
+            Log.e(Const.LOGCAT, "Error in getting notification image, message=" + e.message)
         }
         return null
     }
@@ -102,14 +103,10 @@ class MessagingService : FirebaseMessagingService() {
         super.onNewToken(token)
 
         if (this::preferences.isInitialized) {
-            if (preferences.getFirebaseToken() != token){
+            if (preferences.getFirebaseToken() != token) {
                 preferences.saveFirebaseToken("")
             }
         }
-        Log.i(TAG, token)
-    }
-
-    companion object {
-        private const val TAG = "MessagingService"
+        Log.i(Const.LOGCAT, token)
     }
 }

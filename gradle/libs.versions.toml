@@ -1,32 +1,44 @@
 [versions]
-agp = "8.5.0"
-kotlin = "1.9.24"
+agp = "9.1.0"
+kotlin = "2.3.10"
 java = "17"
-androidSdk = "34"
+androidSdk = "36"
 androidMinSdk = "24"
-ksp = "1.9.24-1.0.20"
-daggerHilt = "2.51.1"
-detekt = "1.23.6"
-googleServices = "4.4.2"
-firebaseCrashlytics = "3.0.2"
-coreKtx = "1.13.1"
-composeBom = "2024.08.00"
-composeCompiler = "1.5.14"
-activityCompose = "1.9.1"
-navigationCompose = "2.7.7"
-hiltCompose = "1.2.0"
-lifecycle = "2.8.4"
-coroutines = "1.8.1"
-okhttp = "4.12.0"
-retrofit = "2.11.0"
-retrofitAdapters = "1.0.11"
-moshi = "1.15.1"
-firebaseBom = "33.1.1"
-googlePlayReview = "2.0.1"
-
+ksp = "2.3.5"
+daggerHilt = "2.59.2"
+detekt = "1.23.8"
+googleServices = "4.4.4"
+firebaseCrashlytics = "3.0.6"
+coreKtx = "1.17.0"
+composeBom = "2026.02.01"
+activityCompose = "1.12.4"
+navigationCompose = "2.9.7"
+hiltCompose = "1.3.0"
+lifecycle = "2.10.0"
+okhttp = "5.3.2"
+retrofit = "3.0.0"
+retrofitAdapters = "1.1.0"
+moshi = "1.15.2"
+firebaseBom = "34.10.0"
+googlePlayReview = "2.0.2"
 junit = "4.13.2"
-junitAndroid = "1.1.5"
-espresso = "3.5.1"
+junitAndroid = "1.3.0"
+espresso = "3.7.0"
+kotlinxSerializationJson = "1.10.0"
+composeStabilityAnalyzer = "0.7.0"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+compose-stability-analyzer = { id = "com.github.skydoves.compose.stability.analyzer", version.ref = "composeStabilityAnalyzer" }
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,9 +61,6 @@ dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-andro
 dagger-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltCompose" }
 dagger-hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltCompose" }
 
-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
-
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitAndroid" }
 androidx-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
@@ -69,20 +78,12 @@ moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.re
 moshi-kotlin-codegen = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi" }
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
-firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 google-play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "googlePlayReview" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 
 [bundles]
-
-[plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
-google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }

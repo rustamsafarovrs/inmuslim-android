@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "942372874359",
     "project_id": "inmuslim-d8095",
-    "storage_bucket": "inmuslim-d8095.appspot.com"
+    "storage_bucket": "inmuslim-d8095.firebasestorage.app"
   },
   "client": [
     {
@@ -12,12 +12,7 @@
           "package_name": "tj.rsdevteam.inmuslim"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "942372874359-at602umairmd9h52muchd26c1tglcddu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyBjnRdOlFUJjFPZy0IyXLw-4AgzLWS_GTg"
@@ -25,12 +20,26 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "942372874359-at602umairmd9h52muchd26c1tglcddu.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942372874359:android:105275c914050414297e72",
+        "android_client_info": {
+          "package_name": "tj.rsdevteam.inmuslim.beta"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjnRdOlFUJjFPZy0IyXLw-4AgzLWS_GTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
         }
       }
     }
