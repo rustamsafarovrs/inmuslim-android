@@ -11,6 +11,7 @@
     <ID>MagicNumber:HomeViewModel.kt$HomeViewModel$60</ID>
     <ID>MagicNumber:HomeViewModel.kt$HomeViewModel$24</ID>
     <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun SettingsScreen( onBackClick: () -> Unit, onRegionClick: () -> Unit, onLanguageClick: () -> Unit )</ID>
+    <ID>MagicNumber:TimeUtils.kt$TimeUtils$12</ID>
   </ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ArgumentListWrapping:HomeScreens.kt$( title = { Text(text = stringResource(id = R.string.app_name)) }, actions = { IconButton(onClick = { navigateToSettings.invoke() }) { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") } })</ID>

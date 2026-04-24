@@ -13,8 +13,7 @@ data class HomeScreenState(
 
 data class ActivePrayer(
     val nameResId: Int,
-    val time: String,
-    val startTime: String,
-    val endTime: String,
+    val startTimeRaw: String,
+    val endInMinutes: Int,
     val progress: Float
 )

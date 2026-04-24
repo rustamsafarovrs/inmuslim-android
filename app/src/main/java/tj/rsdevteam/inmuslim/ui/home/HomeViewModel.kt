@@ -51,6 +51,7 @@ class HomeViewModel
                             state = state.copy(timing = rs.data)
                             calculateCurrentPrayer()
                         }
+
                         is Resource.Error -> {
                             state = state.copy(
                                 errorBottomSheetConfig = ErrorBottomSheetConfig(
@@ -129,26 +130,28 @@ class HomeViewModel
             ishaResId = R.string.isha
         )
 
-        val currentPrayer = info?.let {
-            val total = if (it.endInMinutes > it.startInMinutes) {
-                it.endInMinutes - it.startInMinutes
+        if (info != null) {
+            val total = if (info.endInMinutes > info.startInMinutes) {
+                info.endInMinutes - info.startInMinutes
             } else {
-                (it.endInMinutes + 24 * 60) - it.startInMinutes
+                (info.endInMinutes + 24 * 60) - info.startInMinutes
             }
-            val currentNow = if (now < it.startInMinutes && it.endInMinutes <= it.startInMinutes) {
+            val currentNow = if (now < info.startInMinutes && info.endInMinutes <= info.startInMinutes) {
                 now + 24 * 60
             } else {
                 now
             }
-            val progress = (currentNow - it.startInMinutes).toFloat() / total
-            ActivePrayer(
-                nameResId = it.nameResId,
-                time = it.startTime,
-                startTime = it.startTime,
-                endTime = it.endTime,
-                progress = progress.coerceIn(0f, 1f)
+            val progress = (currentNow - info.startInMinutes).toFloat() / total
+            state = state.copy(
+                currentPrayer = ActivePrayer(
+                    nameResId = info.nameResId,
+                    startTimeRaw = info.startTimeRaw,
+                    endInMinutes = info.endInMinutes,
+                    progress = progress.coerceIn(0f, 1f)
+                )
             )
+        } else {
+            state = state.copy(currentPrayer = null)
         }
-        state = state.copy(currentPrayer = currentPrayer)
     }
 }

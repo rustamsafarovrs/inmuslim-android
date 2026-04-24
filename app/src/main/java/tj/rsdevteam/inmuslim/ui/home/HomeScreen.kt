@@ -43,7 +43,9 @@ import tj.rsdevteam.inmuslim.data.models.Timing
 import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.ui.common.ErrorBottomSheet
 import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
+import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.findActivity
+import tj.rsdevteam.inmuslim.utils.is24HourFormat
 import tj.rsdevteam.inmuslim.utils.launchInAppReview
 
 /**
@@ -127,6 +129,7 @@ private fun HomeScreen(
         }
     ) { paddingValues ->
         val scrollState = rememberScrollState()
+        val is24Hour = LocalContext.current.is24HourFormat()
         if (state.showLoading) {
             ProgressIndicator()
         }
@@ -138,13 +141,12 @@ private fun HomeScreen(
                 .verticalScroll(scrollState)
         ) {
             if (state.timing != null) {
-                val timing = state.timing!!
                 Spacer(modifier = Modifier.height(20.dp))
                 state.currentPrayer?.let {
-                    CurrentPrayerCard(it)
+                    CurrentPrayerCard(it, is24Hour)
                     Spacer(modifier = Modifier.height(20.dp))
                 }
-                TimeItems(timing, state.currentPrayer?.nameResId)
+                TimeItems(state.timing, state.currentPrayer?.nameResId, is24Hour)
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
@@ -160,7 +162,7 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun CurrentPrayerCard(activePrayer: ActivePrayer) {
+private fun CurrentPrayerCard(activePrayer: ActivePrayer, is24Hour: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,12 +193,12 @@ private fun CurrentPrayerCard(activePrayer: ActivePrayer) {
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = activePrayer.startTime,
+                    text = TimeUtils.formatTime(activePrayer.startTimeRaw, is24Hour),
                     style = InmuslimTypo.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
-                    text = activePrayer.endTime,
+                    text = TimeUtils.formatMinutes(activePrayer.endInMinutes, is24Hour),
                     style = InmuslimTypo.titleSmall,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
                 )
@@ -206,47 +208,47 @@ private fun CurrentPrayerCard(activePrayer: ActivePrayer) {
 }
 
 @Composable
-private fun TimeItems(timing: Timing, currentPrayerResId: Int?) {
+private fun TimeItems(timing: Timing, currentPrayerResId: Int?, is24Hour: Boolean) {
     Column {
         TimeItem(
             title = stringResource(R.string.fajr),
-            start = timing.fajr,
+            start = TimeUtils.formatTime(timing.fajr, is24Hour),
             isSelected = currentPrayerResId == R.string.fajr
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
             title = stringResource(R.string.sunrise),
-            start = timing.sunrise,
-            isSelected = false // Sunrise is not a prayer itself, but a boundary
+            start = TimeUtils.formatTime(timing.sunrise, is24Hour),
+            isSelected = false
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
             title = stringResource(R.string.zuhr),
-            start = timing.zuhr,
+            start = TimeUtils.formatTime(timing.zuhr, is24Hour),
             isSelected = currentPrayerResId == R.string.zuhr
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
             title = stringResource(R.string.asr),
-            start = timing.asr,
+            start = TimeUtils.formatTime(timing.asr, is24Hour),
             isSelected = currentPrayerResId == R.string.asr
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
             title = stringResource(R.string.sunset),
-            start = timing.sunset,
+            start = TimeUtils.formatTime(timing.sunset, is24Hour),
             isSelected = false
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
             title = stringResource(R.string.maghrib),
-            start = timing.maghrib,
+            start = TimeUtils.formatTime(timing.maghrib, is24Hour),
             isSelected = currentPrayerResId == R.string.maghrib
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
             title = stringResource(R.string.isha),
-            start = timing.isha,
+            start = TimeUtils.formatTime(timing.isha, is24Hour),
             isSelected = currentPrayerResId == R.string.isha
         )
     }
@@ -269,9 +271,8 @@ private fun HomeScreenPreview() {
                 ),
                 currentPrayer = ActivePrayer(
                     nameResId = R.string.zuhr,
-                    time = "12:30",
-                    startTime = "12:30",
-                    endTime = "16:00",
+                    startTimeRaw = "12:30",
+                    endInMinutes = 16 * 60,
                     progress = 0.5f
                 )
             ),

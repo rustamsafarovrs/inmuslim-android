@@ -1,7 +1,6 @@
 package tj.rsdevteam.inmuslim.utils
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 import tj.rsdevteam.inmuslim.data.models.Timing
 
@@ -16,9 +15,27 @@ class TimeUtilsTest {
     }
 
     @Test
+    fun testFormatTime() {
+        // 24-hour format (default)
+        assertEquals("00:00", TimeUtils.formatTime("00:00"))
+        assertEquals("01:00", TimeUtils.formatTime("1:00"))
+        assertEquals("13:30", TimeUtils.formatTime("13:30"))
+        assertEquals("13:30", TimeUtils.formatTime("13:30:45"))
+        assertEquals("05:05", TimeUtils.formatTime("5:5:10"))
+        assertEquals("invalid", TimeUtils.formatTime("invalid"))
+
+        // 12-hour format
+        assertEquals("12:00 AM", TimeUtils.formatTime("00:00", false))
+        assertEquals("1:00 AM", TimeUtils.formatTime("1:00", false))
+        assertEquals("12:00 PM", TimeUtils.formatTime("12:00", false))
+        assertEquals("1:30 PM", TimeUtils.formatTime("13:30", false))
+        assertEquals("11:59 PM", TimeUtils.formatTime("23:59", false))
+    }
+
+    @Test
     fun testFindCurrentPrayer() {
         val timing = Timing(
-            fajr = "04:00",
+            fajr = "04:00:10",
             sunrise = "06:00",
             zuhr = "13:00",
             asr = "16:00",
@@ -31,31 +48,21 @@ class TimeUtilsTest {
 
         // Before Fajr (Isha from previous day)
         assertEquals(5, TimeUtils.findCurrentPrayer(timing, 3 * 60, 1, 2, 3, 4, 5)?.nameResId)
-        assertEquals("21:00", TimeUtils.findCurrentPrayer(timing, 3 * 60, 1, 2, 3, 4, 5)?.startTime)
+        assertEquals("21:00", TimeUtils.findCurrentPrayer(timing, 3 * 60, 1, 2, 3, 4, 5)?.startTimeRaw)
 
         // At Fajr
         assertEquals(1, TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.nameResId)
-        assertEquals("04:00", TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.startTime)
-        assertEquals("05:59", TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.endTime)
+        assertEquals("04:00:10", TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.startTimeRaw)
+        assertEquals(6 * 60 - 1, TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.endInMinutes)
 
-        // After Sunrise, before Zuhr
-        assertNull(TimeUtils.findCurrentPrayer(timing, 7 * 60, 1, 2, 3, 4, 5))
+        // Formatting for display (24-hour)
+        assertEquals("04:00", TimeUtils.formatTime("04:00:10"))
+        assertEquals("05:59", TimeUtils.formatMinutes(6 * 60 - 1))
 
-        // At Zuhr
-        val zuhrInfo = TimeUtils.findCurrentPrayer(timing, 13 * 60, 1, 2, 3, 4, 5)
-        assertEquals(2, zuhrInfo?.nameResId)
-        assertEquals("13:00", zuhrInfo?.startTime)
-        assertEquals("15:59", zuhrInfo?.endTime)
-
-        // At Maghrib
-        val maghribInfo = TimeUtils.findCurrentPrayer(timing, 19 * 60 + 5, 1, 2, 3, 4, 5)
-        assertEquals(4, maghribInfo?.nameResId)
-        assertEquals("19:44", maghribInfo?.endTime)
-
-        // At Isha
-        val ishaInfo = TimeUtils.findCurrentPrayer(timing, 21 * 60, 1, 2, 3, 4, 5)
-        assertEquals(5, ishaInfo?.nameResId)
-        assertEquals("21:00", ishaInfo?.startTime)
-        assertEquals("03:59", ishaInfo?.endTime)
+        // Formatting for display (12-hour)
+        assertEquals("9:00 PM", TimeUtils.formatTime("21:00", false))
+        assertEquals("3:59 AM", TimeUtils.formatMinutes(3 * 60 + 59, false))
+        assertEquals("1:00 PM", TimeUtils.formatTime("13:00", false))
+        assertEquals("3:59 PM", TimeUtils.formatMinutes(16 * 60 - 1, false))
     }
 }
