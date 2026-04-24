@@ -1,6 +1,7 @@
 package tj.rsdevteam.inmuslim.utils
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import tj.rsdevteam.inmuslim.data.models.Timing
 
@@ -45,6 +46,10 @@ class TimeUtilsTest {
         )
 
         // fajrResId=1, zuhrResId=2, asrResId=3, maghribResId=4, ishaResId=5 for testing
+
+        // Makruh sunset period (19:00–19:04): no prayer active
+        assertNull(TimeUtils.findCurrentPrayer(timing, 19 * 60, 1, 2, 3, 4, 5))
+        assertNull(TimeUtils.findCurrentPrayer(timing, 19 * 60 + 4, 1, 2, 3, 4, 5))
 
         // Before Fajr (Isha from previous day)
         assertEquals(5, TimeUtils.findCurrentPrayer(timing, 3 * 60, 1, 2, 3, 4, 5)?.nameResId)

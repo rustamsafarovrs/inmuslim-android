@@ -60,13 +60,14 @@ object TimeUtils {
         val sr = timeToMinutes(timing.sunrise)
         val z = timeToMinutes(timing.zuhr)
         val a = timeToMinutes(timing.asr)
+        val s = timeToMinutes(timing.sunset)
         val m = timeToMinutes(timing.maghrib)
         val i = timeToMinutes(timing.isha)
 
         return when {
             now in f until sr -> PrayerInfo(fajrResId, timing.fajr, f, sr - 1)
             now in z until a -> PrayerInfo(zuhrResId, timing.zuhr, z, a - 1)
-            now in a until m -> PrayerInfo(asrResId, timing.asr, a, m - 1)
+            now in a until s -> PrayerInfo(asrResId, timing.asr, a, s - 1)
             now in m until (m + 40) -> PrayerInfo(maghribResId, timing.maghrib, m, m + 39)
             now >= i || now < f -> {
                 val iMinutes = if (now < f) i - 24 * 60 else i
