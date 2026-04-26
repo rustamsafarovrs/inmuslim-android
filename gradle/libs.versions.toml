@@ -1,6 +1,6 @@
 [versions]
 agp = "9.2.0"
-kotlin = "2.3.10"
+kotlin = "2.3.21"
 java = "17"
 androidSdk = "36"
 androidMinSdk = "24"
