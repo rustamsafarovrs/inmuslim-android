@@ -21,3 +21,4 @@ local.properties
 /config/release.keystore
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/codeStyles/Project.xml
+.kotlin/
