@@ -256,7 +256,7 @@ private fun TimeItem(title: String, start: String, isSelected: Boolean = false) 
 
 @Preview
 @Composable
-private fun HomeScreenPreview() {
+private fun HomeScreenFajrPreview() {
     InmuslimTheme {
         HomeScreen(
             state = HomeScreenState(
@@ -270,10 +270,10 @@ private fun HomeScreenPreview() {
                     isha = "20:00"
                 ),
                 currentPrayer = ActivePrayer(
-                    nameResId = R.string.zuhr,
-                    startTimeRaw = "12:30",
-                    endInMinutes = 16 * 60,
-                    progress = 0.5f
+                    nameResId = R.string.fajr,
+                    startTimeRaw = "05:00",
+                    endInMinutes = 6 * 60 + 30,
+                    progress = 0.3f
                 )
             ),
             didClickSettings = {},
@@ -284,7 +284,86 @@ private fun HomeScreenPreview() {
 
 @Preview
 @Composable
-fun TimeItemPreview() {
+private fun HomeScreenAsrPreview() {
+    InmuslimTheme {
+        HomeScreen(
+            state = HomeScreenState(
+                timing = Timing(
+                    fajr = "05:00",
+                    sunrise = "06:30",
+                    zuhr = "12:30",
+                    asr = "16:00",
+                    sunset = "18:30",
+                    maghrib = "18:45",
+                    isha = "20:00"
+                ),
+                currentPrayer = ActivePrayer(
+                    nameResId = R.string.asr,
+                    startTimeRaw = "16:00",
+                    endInMinutes = 18 * 60 + 30,
+                    progress = 0.6f
+                )
+            ),
+            didClickSettings = {},
+            handleEvent = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenMaghribPreview() {
+    InmuslimTheme {
+        HomeScreen(
+            state = HomeScreenState(
+                timing = Timing(
+                    fajr = "05:00",
+                    sunrise = "06:30",
+                    zuhr = "12:30",
+                    asr = "16:00",
+                    sunset = "18:30",
+                    maghrib = "18:45",
+                    isha = "20:00"
+                ),
+                currentPrayer = ActivePrayer(
+                    nameResId = R.string.maghrib,
+                    startTimeRaw = "18:45",
+                    endInMinutes = 20 * 60,
+                    progress = 0.4f
+                )
+            ),
+            didClickSettings = {},
+            handleEvent = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenNoPrayerPreview() {
+    InmuslimTheme {
+        HomeScreen(
+            state = HomeScreenState(
+                timing = Timing(
+                    fajr = "05:00",
+                    sunrise = "06:30",
+                    zuhr = "12:30",
+                    asr = "16:00",
+                    sunset = "18:30",
+                    maghrib = "18:45",
+                    isha = "20:00"
+                ),
+                currentPrayer = null
+            ),
+            didClickSettings = {},
+            handleEvent = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TimeItemPreview() {
     InmuslimTheme {
         TimeItem(title = "title", start = "00:00:00")
     }
