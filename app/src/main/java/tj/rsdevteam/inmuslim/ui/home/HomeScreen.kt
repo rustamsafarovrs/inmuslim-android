@@ -54,41 +54,6 @@ import tj.rsdevteam.inmuslim.utils.launchInAppReview
  */
 
 @Composable
-private fun TimeItem(title: String, start: String, isSelected: Boolean = false) {
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.secondaryContainer
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
-    }
-    val contentColor = if (isSelected) {
-        MaterialTheme.colorScheme.onSecondaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
-
-    Row(
-        modifier = Modifier
-            .defaultMinSize(minHeight = 60.dp)
-            .clip(shape = InmuslimShapes.large)
-            .background(backgroundColor)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            style = InmuslimTypo.titleMedium,
-            color = contentColor
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = start,
-            style = InmuslimTypo.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-            color = contentColor
-        )
-    }
-}
-
-@Composable
 fun HomeScreen() {
     val viewModel: HomeViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -102,7 +67,7 @@ fun HomeScreen() {
 
     HomeScreen(
         state = viewModel.state,
-        onSettingsClick = { router.navigate(Screen.Settings) },
+        didClickSettings = { router.navigate(Screen.Settings) },
         handleEvent = { viewModel.handleEvent(it) }
     )
 }
@@ -111,7 +76,7 @@ fun HomeScreen() {
 @Composable
 private fun HomeScreen(
     state: HomeScreenState,
-    onSettingsClick: () -> Unit,
+    didClickSettings: () -> Unit,
     handleEvent: (HomeUIEvent) -> Unit
 ) {
     val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -121,7 +86,7 @@ private fun HomeScreen(
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
-                    IconButton(onClick = onSettingsClick) {
+                    IconButton(onClick = didClickSettings) {
                         Icon(painterResource(R.drawable.ic_settings_24), contentDescription = "Settings")
                     }
                 }
@@ -254,6 +219,41 @@ private fun TimeItems(timing: Timing, currentPrayerResId: Int?, is24Hour: Boolea
     }
 }
 
+@Composable
+private fun TimeItem(title: String, start: String, isSelected: Boolean = false) {
+    val backgroundColor = if (isSelected) {
+        MaterialTheme.colorScheme.secondaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    val contentColor = if (isSelected) {
+        MaterialTheme.colorScheme.onSecondaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Row(
+        modifier = Modifier
+            .defaultMinSize(minHeight = 60.dp)
+            .clip(shape = InmuslimShapes.large)
+            .background(backgroundColor)
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = InmuslimTypo.titleMedium,
+            color = contentColor
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = start,
+            style = InmuslimTypo.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            color = contentColor
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun HomeScreenPreview() {
@@ -276,7 +276,7 @@ private fun HomeScreenPreview() {
                     progress = 0.5f
                 )
             ),
-            onSettingsClick = {},
+            didClickSettings = {},
             handleEvent = {}
         )
     }

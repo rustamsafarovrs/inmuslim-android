@@ -55,8 +55,148 @@ import tj.rsdevteam.inmuslim.utils.Utils
  */
 
 @Composable
+fun SettingsScreen() {
+    val router = LocalRouter.current
+    val context = LocalContext.current
+
+    SettingsScreen(
+        didClickBack = { router.navigateUp() },
+        didClickRegion = { router.navigate(Screen.Regions) },
+        didClickLanguage = { Utils.openLanguageSettings(context) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsScreen(
+    didClickBack: () -> Unit,
+    didClickRegion: () -> Unit,
+    didClickLanguage: () -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    Scaffold(
+        topBar = {
+            LargeTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.settings),
+                        style = InmuslimTypo.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = didClickBack) {
+                        Icon(
+                            painterResource(R.drawable.ic_arrow_back_24),
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                )
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(state = rememberScrollState())
+                .fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.general).uppercase(),
+                style = InmuslimTypo.labelLarge.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    letterSpacing = 1.sp
+                ),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
+
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
+                shape = InmuslimShapes.large,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Column {
+                    SettingItem(
+                        icon = ImageVector.vectorResource(R.drawable.ic_location_on_24),
+                        title = stringResource(R.string.change_region),
+                        desc = stringResource(R.string.change_region_desc),
+                        didClick = didClickRegion,
+                        showDivider = true
+                    )
+                    SettingItem(
+                        icon = ImageVector.vectorResource(R.drawable.ic_dictionary_24),
+                        title = stringResource(R.string.change_language),
+                        desc = stringResource(R.string.change_language_desc),
+                        didClick = didClickLanguage
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                shape = InmuslimShapes.large,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_brightness_alert_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(R.string.timing_source),
+                        style = InmuslimTypo.bodyMedium.copy(
+                            lineHeight = 20.sp,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Version ${tj.rsdevteam.inmuslim.BuildConfig.VERSION_NAME}",
+                style = InmuslimTypo.labelSmall,
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
 private fun SettingItem(
-    onClick: () -> Unit,
+    didClick: () -> Unit,
     icon: ImageVector,
     title: String,
     desc: String,
@@ -66,7 +206,7 @@ private fun SettingItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick.invoke() }
+                .clickable { didClick.invoke() }
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -121,154 +261,14 @@ private fun SettingItem(
     }
 }
 
-@Composable
-fun SettingsScreen() {
-    val router = LocalRouter.current
-    val context = LocalContext.current
-
-    SettingsScreen(
-        onBackClick = { router.navigateUp() },
-        onRegionClick = { router.navigate(Screen.Regions) },
-        onLanguageClick = { Utils.openLanguageSettings(context) }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SettingsScreen(
-    onBackClick: () -> Unit,
-    onRegionClick: () -> Unit,
-    onLanguageClick: () -> Unit
-) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-    Scaffold(
-        topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.settings),
-                        style = InmuslimTypo.headlineMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            painterResource(R.drawable.ic_arrow_back_24),
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(state = rememberScrollState())
-                .fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.general).uppercase(),
-                style = InmuslimTypo.labelLarge.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    letterSpacing = 1.sp
-                ),
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-            )
-
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth(),
-                shape = InmuslimShapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-            ) {
-                Column {
-                    SettingItem(
-                        icon = ImageVector.vectorResource(R.drawable.ic_location_on_24),
-                        title = stringResource(R.string.change_region),
-                        desc = stringResource(R.string.change_region_desc),
-                        onClick = onRegionClick,
-                        showDivider = true
-                    )
-                    SettingItem(
-                        icon = ImageVector.vectorResource(R.drawable.ic_dictionary_24),
-                        title = stringResource(R.string.change_language),
-                        desc = stringResource(R.string.change_language_desc),
-                        onClick = onLanguageClick
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                shape = InmuslimShapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_brightness_alert_24),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(R.string.timing_source),
-                        style = InmuslimTypo.bodyMedium.copy(
-                            lineHeight = 20.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        ),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "Version ${tj.rsdevteam.inmuslim.BuildConfig.VERSION_NAME}",
-                style = InmuslimTypo.labelSmall,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun SettingsScreenPreview() {
     InmuslimTheme {
         SettingsScreen(
-            onBackClick = {},
-            onRegionClick = {},
-            onLanguageClick = {}
+            didClickBack = {},
+            didClickRegion = {},
+            didClickLanguage = {}
         )
     }
 }

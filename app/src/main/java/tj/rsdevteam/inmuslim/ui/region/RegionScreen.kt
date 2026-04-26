@@ -45,39 +45,18 @@ import tj.rsdevteam.inmuslim.utils.findActivity
  */
 
 @Composable
-private fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: (Region) -> Unit) {
-    LazyColumn(modifier = modifier) {
-        items(list) { region ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clickable { onClick.invoke(region) }
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .defaultMinSize(minHeight = 50.dp)
-            ) {
-                Text(text = region.name, style = InmuslimTypo.labelLarge)
-                Spacer(modifier = Modifier.weight(1f))
-                if (region.selected.value) {
-                    Icon(painterResource(R.drawable.ic_check_24), contentDescription = null)
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun RegionScreen() {
     val router = LocalRouter.current
     val context = LocalContext.current
     val hasBackStack = router.controller.previousBackStackEntry != null
     val viewModel: RegionViewModel = hiltViewModel()
+
     RegionScreen(
         state = viewModel.state,
         showBackButton = hasBackStack,
         handleEvent = { viewModel.handleEvent(it) },
-        onBackClick = { router.navigateUp() },
-        onSelected = {
+        didClickBack = { router.navigateUp() },
+        didSelect = {
             if (hasBackStack) {
                 context.findActivity().finish()
                 context.startActivity(Intent(context, MainActivity::class.java))
@@ -94,8 +73,8 @@ private fun RegionScreen(
     state: RegionScreenState,
     showBackButton: Boolean,
     handleEvent: (RegionUIEvent) -> Unit,
-    onBackClick: () -> Unit,
-    onSelected: () -> Unit
+    didClickBack: () -> Unit,
+    didSelect: () -> Unit
 ) {
     val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -105,7 +84,7 @@ private fun RegionScreen(
             .navigationBarsPadding()
     ) {
         if (showBackButton) {
-            IconButton(onClick = onBackClick, modifier = Modifier.padding(4.dp)) {
+            IconButton(onClick = didClickBack, modifier = Modifier.padding(4.dp)) {
                 Icon(painterResource(R.drawable.ic_arrow_back_24), contentDescription = null)
             }
         }
@@ -128,7 +107,7 @@ private fun RegionScreen(
             Spacer(modifier = Modifier.height(12.dp))
             PrimaryButton(text = "OK") {
                 handleEvent(RegionUIEvent.DidClickConfirm)
-                onSelected.invoke()
+                didSelect.invoke()
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -140,6 +119,28 @@ private fun RegionScreen(
             errorBottomSheetConfig = state.sheetConfig!!,
             dismiss = { handleEvent(RegionUIEvent.DismissDialog) }
         )
+    }
+}
+
+@Composable
+private fun Regions(list: List<Region>, modifier: Modifier = Modifier, didClick: (Region) -> Unit) {
+    LazyColumn(modifier = modifier) {
+        items(list) { region ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clickable { didClick.invoke(region) }
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .defaultMinSize(minHeight = 50.dp)
+            ) {
+                Text(text = region.name, style = InmuslimTypo.labelLarge)
+                Spacer(modifier = Modifier.weight(1f))
+                if (region.selected.value) {
+                    Icon(painterResource(R.drawable.ic_check_24), contentDescription = null)
+                }
+            }
+        }
     }
 }
 
@@ -157,8 +158,8 @@ private fun RegionScreenPreview() {
             ),
             showBackButton = false,
             handleEvent = {},
-            onBackClick = {},
-            onSelected = {}
+            didClickBack = {},
+            didSelect = {}
         )
     }
 }
