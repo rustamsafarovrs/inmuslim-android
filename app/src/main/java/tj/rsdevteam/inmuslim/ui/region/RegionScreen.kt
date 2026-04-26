@@ -1,5 +1,6 @@
 package tj.rsdevteam.inmuslim.ui.region
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,11 +15,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,9 +33,11 @@ import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.res.R
+import tj.rsdevteam.inmuslim.ui.MainActivity
 import tj.rsdevteam.inmuslim.ui.common.ErrorBottomSheet
 import tj.rsdevteam.inmuslim.ui.common.PrimaryButton
 import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
+import tj.rsdevteam.inmuslim.utils.findActivity
 
 /**
  * Created by Rustam Safarov on 14/08/23.
@@ -64,22 +69,22 @@ private fun Regions(list: List<Region>, modifier: Modifier = Modifier, onClick: 
 @Composable
 fun RegionScreen() {
     val router = LocalRouter.current
-    RegionScreen(isBottomSheet = false) {
-        router.navigateAsRoot(Screen.Main)
-    }
-}
-
-@Composable
-fun RegionScreen(
-    isBottomSheet: Boolean,
-    onSelected: () -> Unit
-) {
+    val context = LocalContext.current
+    val hasBackStack = router.controller.previousBackStackEntry != null
     val viewModel: RegionViewModel = hiltViewModel()
     RegionScreen(
         state = viewModel.state,
-        isBottomSheet = isBottomSheet,
+        showBackButton = hasBackStack,
         handleEvent = { viewModel.handleEvent(it) },
-        onSelected = onSelected
+        onBackClick = { router.navigateUp() },
+        onSelected = {
+            if (hasBackStack) {
+                context.findActivity().finish()
+                context.startActivity(Intent(context, MainActivity::class.java))
+            } else {
+                router.navigateAsRoot(Screen.Main)
+            }
+        }
     )
 }
 
@@ -87,21 +92,27 @@ fun RegionScreen(
 @Composable
 private fun RegionScreen(
     state: RegionScreenState,
-    isBottomSheet: Boolean,
+    showBackButton: Boolean,
     handleEvent: (RegionUIEvent) -> Unit,
+    onBackClick: () -> Unit,
     onSelected: () -> Unit
 ) {
     val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Column(
         modifier = Modifier
-            .then(if (isBottomSheet) Modifier else Modifier.navigationBarsPadding())
-            .then(if (isBottomSheet) Modifier else Modifier.statusBarsPadding())
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
+        if (showBackButton) {
+            IconButton(onClick = onBackClick, modifier = Modifier.padding(4.dp)) {
+                Icon(painterResource(R.drawable.ic_arrow_back_24), contentDescription = null)
+            }
+        }
         if (state.showLoading) {
             ProgressIndicator()
         } else {
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(if (showBackButton) 8.dp else 30.dp))
             Text(
                 text = stringResource(R.string.select_region_title),
                 style = InmuslimTypo.titleLarge,
@@ -144,8 +155,9 @@ private fun RegionScreenPreview() {
                     Region(2, "Bokhtar")
                 )
             ),
-            isBottomSheet = false,
+            showBackButton = false,
             handleEvent = {},
+            onBackClick = {},
             onSelected = {}
         )
     }

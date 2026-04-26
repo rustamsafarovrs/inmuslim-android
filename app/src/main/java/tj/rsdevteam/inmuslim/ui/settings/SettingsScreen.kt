@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,17 +23,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,15 +41,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.core.router.LocalRouter
+import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimShapes
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.res.R
-import tj.rsdevteam.inmuslim.ui.region.RegionScreen
 import tj.rsdevteam.inmuslim.utils.Utils
-import tj.rsdevteam.inmuslim.utils.findActivity
 
 /**
  * Created by Rustam Safarov on 8/19/23.
@@ -131,45 +121,16 @@ private fun SettingItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RegionsBottomSheet(onDismiss: () -> Unit) {
-    val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    ModalBottomSheet(
-        onDismissRequest = { onDismiss.invoke() },
-        sheetState = state,
-        dragHandle = { BottomSheetDefaults.DragHandle() }
-    ) {
-        RegionScreen(isBottomSheet = true) {
-            scope.launch {
-                state.hide()
-                onDismiss.invoke()
-                context.findActivity().recreate()
-            }
-        }
-    }
-}
-
 @Composable
 fun SettingsScreen() {
     val router = LocalRouter.current
     val context = LocalContext.current
-    var regionsBottomSheetState by remember { mutableStateOf(false) }
 
     SettingsScreen(
         onBackClick = { router.navigateUp() },
-        onRegionClick = { regionsBottomSheetState = true },
+        onRegionClick = { router.navigate(Screen.Regions) },
         onLanguageClick = { Utils.openLanguageSettings(context) }
     )
-
-    if (regionsBottomSheetState) {
-        RegionsBottomSheet {
-            regionsBottomSheetState = false
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
