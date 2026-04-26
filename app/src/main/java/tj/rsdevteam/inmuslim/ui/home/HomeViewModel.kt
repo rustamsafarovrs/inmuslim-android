@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.data.models.ErrorBottomSheetConfig
 import tj.rsdevteam.inmuslim.data.models.Resource
@@ -31,6 +33,8 @@ class HomeViewModel
     var state by mutableStateOf(HomeScreenState())
         private set
 
+    private var prayerEndJob: Job? = null
+
     init {
         state = state.copy(isReviewShown = userRepository.isReviewShown())
         if (userRepository.getUserId() != -1L) {
@@ -41,28 +45,33 @@ class HomeViewModel
         refresh()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        prayerEndJob?.cancel()
+    }
+
     private fun getTiming() {
         viewModelScope.launch {
-            timingRepository.getTiming()
-                .collect { rs ->
-                    when (rs) {
-                        is Resource.InProgress -> Unit
-                        is Resource.Success -> {
-                            state = state.copy(timing = rs.data)
-                            calculateCurrentPrayer()
-                        }
-
-                        is Resource.Error -> {
-                            state = state.copy(
-                                errorBottomSheetConfig = ErrorBottomSheetConfig(
-                                    msg = rs.error?.message,
-                                    title = "Error",
-                                )
-                            )
-                        }
+            val isFirstLoad = state.timing == null
+            timingRepository.getTiming().collect { rs ->
+                when (rs) {
+                    is Resource.InProgress -> Unit
+                    is Resource.Success -> {
+                        state = state.copy(timing = rs.data)
+                        calculateCurrentPrayer()
                     }
-                    state = state.copy(showLoading = rs is Resource.InProgress)
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            errorBottomSheetConfig = ErrorBottomSheetConfig(
+                                msg = rs.error?.message,
+                                title = "Error",
+                            )
+                        )
+                    }
                 }
+                state = state.copy(showLoading = isFirstLoad && rs is Resource.InProgress)
+            }
         }
     }
 
@@ -152,6 +161,23 @@ class HomeViewModel
             )
         } else {
             state = state.copy(currentPrayer = null)
+        }
+
+        schedulePrayerEndRefresh()
+    }
+
+    private fun schedulePrayerEndRefresh() {
+        prayerEndJob?.cancel()
+        val endInMinutes = state.currentPrayer?.endInMinutes ?: return
+        val now = TimeUtils.getCurrentTimeInMinutes()
+        val delayMinutes = if (endInMinutes >= now) {
+            endInMinutes + 1 - now
+        } else {
+            endInMinutes + 24 * 60 + 1 - now
+        }
+        prayerEndJob = viewModelScope.launch {
+            delay(delayMinutes * 60_000L)
+            getTiming()
         }
     }
 }
