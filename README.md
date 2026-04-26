@@ -14,8 +14,8 @@ Follow these steps to set up and compile the project on your local machine:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/rustamsafarovrs/InmuslimAndroid.git
-   cd InmuslimAndroid
+   git clone https://github.com/rustamsafarovrs/inmuslim-android.git
+   cd inmuslim-android
    ```
 2. **Install git hooks:**
    To ensure code quality, install the local pre-commit hooks that run `detekt` and `lint` before each commit:

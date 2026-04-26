@@ -19,3 +19,5 @@ local.properties
 /.idea/migrations.xml
 /.idea/other.xml
 /config/release.keystore
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/codeStyles/Project.xml
