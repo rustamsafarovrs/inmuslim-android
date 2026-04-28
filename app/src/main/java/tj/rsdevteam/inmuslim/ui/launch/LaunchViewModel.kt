@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LaunchViewModel
 @Inject constructor(
-    private val regionRepository: RegionRepository
+    private val regionRepository: RegionRepository,
 ) : ViewModel() {
 
     private val _event = Channel<LaunchVMEvent>()

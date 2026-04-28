@@ -10,5 +10,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class MessageDTO(
     val result: Int,
-    val msg: String
+    val msg: String,
 )

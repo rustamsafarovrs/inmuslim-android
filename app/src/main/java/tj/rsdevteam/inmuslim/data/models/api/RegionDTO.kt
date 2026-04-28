@@ -10,5 +10,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class RegionDTO(
     val id: Long,
-    val name: String
+    val name: String,
 )

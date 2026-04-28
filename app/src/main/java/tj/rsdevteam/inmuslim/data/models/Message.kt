@@ -6,5 +6,5 @@ package tj.rsdevteam.inmuslim.data.models
  */
 
 data class Message(
-    val message: String
+    val message: String,
 )

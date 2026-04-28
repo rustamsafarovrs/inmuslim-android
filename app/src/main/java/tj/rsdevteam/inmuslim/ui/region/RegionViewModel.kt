@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import tj.rsdevteam.inmuslim.data.models.ErrorBottomSheetConfig
+import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.models.Region
-import tj.rsdevteam.inmuslim.data.models.Resource
 import tj.rsdevteam.inmuslim.data.repositories.RegionRepository
+import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheetConfig
 import javax.inject.Inject
 
 /**
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegionViewModel
 @Inject constructor(
-    private val regionRepository: RegionRepository
+    private val regionRepository: RegionRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(RegionScreenState())
@@ -42,7 +42,7 @@ class RegionViewModel
                             sheetConfig = ErrorBottomSheetConfig(
                                 msg = rs.error?.message,
                                 title = "Error",
-                            )
+                            ),
                         )
                     }
                 }

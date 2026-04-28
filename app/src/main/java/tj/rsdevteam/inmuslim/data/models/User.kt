@@ -6,5 +6,5 @@ package tj.rsdevteam.inmuslim.data.models
  */
 
 data class User(
-    val id: Long
+    val id: Long,
 )

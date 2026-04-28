@@ -17,3 +17,7 @@ internal fun Context.findActivity(): Activity {
     }
     error("Activity not found")
 }
+
+fun Context.is24HourFormat(): Boolean {
+    return android.text.format.DateFormat.is24HourFormat(this)
+}

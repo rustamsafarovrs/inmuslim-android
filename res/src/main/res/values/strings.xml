@@ -1,21 +1,43 @@
 <resources>
     <string name="app_name" translatable="false">Inmuslim</string>
-    <string name="default_notification_channel_id" translatable="false">Push-notifications</string>
-    <string name="settings">Танзимот</string>
-    <string name="fajr">Бомдод</string>
-    <string name="sunrise">Тулӯи офтоб</string>
-    <string name="zuhr">Пешин</string>
-    <string name="asr">Аср</string>
-    <string name="sunset">Ғуруби офтоб</string>
-    <string name="maghrib">Шом</string>
-    <string name="isha">Хуфтан</string>
-    <string name="change_region">Тағйир додани минтақа</string>
-    <string name="change_region_desc">Ба минтақаи дигар иваз намудан</string>
-    <string name="select_region_title">Минтақа ё шаҳрро интихоб кунед</string>
-    <string name="timing_source">Вақтҳои намоз аз сомонаи shuroiulamo.tj гирифта шудаанд</string>
-    <string name="change_language">Тағйири забон</string>
-    <string name="change_language_desc">Интихоби забони барнома</string>
-    <string name="general">Умумӣ</string>
-    <string name="error_title">Хатогӣ</string>
-    <string name="current_prayer_time">Вақти намози ҷорӣ</string>
+
+    <!-- Base -->
+    <string name="base_prayer_fajr">Бомдод</string>
+    <string name="base_prayer_sunrise">Тулӯи офтоб</string>
+    <string name="base_prayer_zuhr">Пешин</string>
+    <string name="base_prayer_asr">Аср</string>
+    <string name="base_prayer_sunset">Ғуруби офтоб</string>
+    <string name="base_prayer_maghrib">Шом</string>
+    <string name="base_prayer_isha">Хуфтан</string>
+    <string name="base_title_current_prayer">Вақти намози ҷорӣ</string>
+    <string name="base_title_select_region">Минтақа ё шаҳрро интихоб кунед</string>
+    <string name="base_action_change_region">Тағйир додани минтақа</string>
+    <string name="base_description_change_region">Ба минтақаи дигар иваз намудан</string>
+    <string name="base_description_timing_source">Вақтҳои намоз аз сомонаи shuroiulamo.tj гирифта шудаанд</string>
+
+    <!-- Common -->
+    <string name="common_common_push_notifications" translatable="false">Push-notifications</string>
+    <string name="common_common_error_title">Хатогӣ</string>
+    <string name="common_title_settings">Танзимот</string>
+    <string name="common_title_general">Умумӣ</string>
+    <string name="common_action_cancel">Бекор</string>
+    <string name="common_action_add">Иловакунӣ</string>
+    <string name="common_action_change_language">Тағйири забон</string>
+    <string name="common_description_change_language">Интихоби забони барнома</string>
+
+    <!-- Tasbih -->
+    <string name="tasbih_title_tasbih">Тасбеҳ</string>
+    <string name="tasbih_title_list">Рӯйхати тасбеҳ</string>
+    <string name="tasbih_title_history">Таърих</string>
+    <string name="tasbih_action_add_tasbih">Илова кардан</string>
+    <string name="tasbih_action_reset">Аз нав</string>
+    <string name="tasbih_action_haptic_enable">Вибратсияро фаъол кунед</string>
+    <string name="tasbih_action_haptic_disable">Вибратсияро хомӯш кунед</string>
+    <string name="tasbih_title_reset_confirm">Ҳисобро аз нав оғоз кунем?</string>
+    <string name="tasbih_description_reset_confirm">Ҳисоби имрӯза ба сифр баргардонида мешавад. Ин амалро бекор кардан мумкин нест.</string>
+    <string name="tasbih_hint_name">Номи тасбеҳ</string>
+    <string name="tasbih_description_tap_to_count">Барои ҳисоб кардан клик кунед</string>
+    <string name="tasbih_other_empty">Тасбеҳе илова нашудааст</string>
+    <string name="tasbih_other_add_first">Тасбеҳи аввалатонро илова кунед</string>
+    <string name="tasbih_other_no_history">Таърих мавҷуд нест</string>
 </resources>

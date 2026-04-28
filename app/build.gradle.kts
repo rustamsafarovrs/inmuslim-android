@@ -19,11 +19,11 @@ android {
         applicationId = "tj.rsdevteam.inmuslim"
         minSdk = libs.versions.androidMinSdk.get().toInt()
         targetSdk = libs.versions.androidSdk.get().toInt()
-        versionCode = 6
-        versionName = "1.1.0"
-
+        versionCode = 7
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
+        manifestPlaceholders["appName"] = "@string/app_name"
     }
     signingConfigs {
         getByName("debug") {
@@ -56,6 +56,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".beta"
             signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["appName"] = "Inmuslim Beta"
         }
     }
     compileOptions {
@@ -125,5 +126,8 @@ dependencies {
 
     implementation(libs.google.play.review.ktx)
     implementation(project(":core"))
+    implementation(project(":data"))
     implementation(project(":res"))
+    implementation(project(":uicomponents"))
+    implementation(project(":feature:tasbih"))
 }

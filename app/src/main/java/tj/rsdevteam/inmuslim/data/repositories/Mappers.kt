@@ -18,7 +18,7 @@ import tj.rsdevteam.inmuslim.data.models.api.UpdateMessagingIdDTO
 fun RegionDTO.toRegion(): Region {
     return Region(
         id = this.id,
-        name = this.name
+        name = this.name,
     )
 }
 
@@ -30,24 +30,24 @@ fun TimingDTO.toTiming(): Timing {
         asr = this.asr,
         sunset = this.sunset,
         maghrib = this.maghrib,
-        isha = this.isha
+        isha = this.isha,
     )
 }
 
 fun MessageDTO.toMessage(): Message {
     return Message(
-        message = this.msg
+        message = this.msg,
     )
 }
 
 fun RegisterUserDTO.toUser(): User {
     return User(
-        id = this.id
+        id = this.id,
     )
 }
 
 fun UpdateMessagingIdDTO.toMessage(): Message {
     return Message(
-        message = this.msg
+        message = this.msg,
     )
 }

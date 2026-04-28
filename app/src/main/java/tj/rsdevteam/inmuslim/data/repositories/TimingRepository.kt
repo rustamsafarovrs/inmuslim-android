@@ -2,8 +2,8 @@ package tj.rsdevteam.inmuslim.data.repositories
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.api.Api
-import tj.rsdevteam.inmuslim.data.models.Resource
 import tj.rsdevteam.inmuslim.data.models.Timing
 import tj.rsdevteam.inmuslim.data.preferences.Preferences
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class TimingRepository
 @Inject constructor(
     private val api: Api,
     private val preferences: Preferences,
-    private val errorHandler: ErrorHandler
+    private val errorHandler: ErrorHandler,
 ) {
 
     fun getTiming(): Flow<Resource<Timing>> = flow {

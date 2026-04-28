@@ -1,10 +1,10 @@
 package tj.rsdevteam.inmuslim.data.repositories
 
 import retrofit2.HttpException
+import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.exceptions.ApiException
 import tj.rsdevteam.inmuslim.data.exceptions.ConnectionTimeoutException
 import tj.rsdevteam.inmuslim.data.exceptions.UnknownException
-import tj.rsdevteam.inmuslim.data.models.Resource
 import tj.rsdevteam.inmuslim.data.models.api.MessageDTO
 import java.io.IOException
 import java.net.UnknownHostException

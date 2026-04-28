@@ -9,5 +9,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class RegisterUserBodyDTO(
-    val name: String
+    val name: String,
 )

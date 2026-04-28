@@ -15,5 +15,5 @@ data class GetTimingDTO(
     val region: String,
     @Json(name = "begin_date")
     val beginDate: String,
-    val timing: TimingDTO
+    val timing: TimingDTO,
 )

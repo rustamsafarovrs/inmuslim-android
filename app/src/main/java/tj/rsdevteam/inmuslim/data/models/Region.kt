@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 
 data class Region(
     val id: Long,
-    val name: String
+    val name: String,
 ) {
 
     @Transient

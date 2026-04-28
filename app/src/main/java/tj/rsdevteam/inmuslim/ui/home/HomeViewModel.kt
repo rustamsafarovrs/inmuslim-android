@@ -6,14 +6,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import tj.rsdevteam.inmuslim.data.models.ErrorBottomSheetConfig
-import tj.rsdevteam.inmuslim.data.models.Resource
+import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.repositories.TimingRepository
 import tj.rsdevteam.inmuslim.data.repositories.UserRepository
 import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.Utils
+import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheetConfig
 import javax.inject.Inject
 
 /**
@@ -25,11 +27,13 @@ import javax.inject.Inject
 class HomeViewModel
 @Inject constructor(
     private val timingRepository: TimingRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeScreenState())
         private set
+
+    private var prayerEndJob: Job? = null
 
     init {
         state = state.copy(isReviewShown = userRepository.isReviewShown())
@@ -41,27 +45,33 @@ class HomeViewModel
         refresh()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        prayerEndJob?.cancel()
+    }
+
     private fun getTiming() {
         viewModelScope.launch {
-            timingRepository.getTiming()
-                .collect { rs ->
-                    when (rs) {
-                        is Resource.InProgress -> Unit
-                        is Resource.Success -> {
-                            state = state.copy(timing = rs.data)
-                            calculateCurrentPrayer()
-                        }
-                        is Resource.Error -> {
-                            state = state.copy(
-                                errorBottomSheetConfig = ErrorBottomSheetConfig(
-                                    msg = rs.error?.message,
-                                    title = "Error",
-                                )
-                            )
-                        }
+            val isFirstLoad = state.timing == null
+            timingRepository.getTiming().collect { rs ->
+                when (rs) {
+                    is Resource.InProgress -> Unit
+                    is Resource.Success -> {
+                        state = state.copy(timing = rs.data)
+                        calculateCurrentPrayer()
                     }
-                    state = state.copy(showLoading = rs is Resource.InProgress)
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            errorBottomSheetConfig = ErrorBottomSheetConfig(
+                                msg = rs.error?.message,
+                                title = "Error",
+                            ),
+                        )
+                    }
                 }
+                state = state.copy(showLoading = isFirstLoad && rs is Resource.InProgress)
+            }
         }
     }
 
@@ -122,33 +132,52 @@ class HomeViewModel
         val info = TimeUtils.findCurrentPrayer(
             timing = timing,
             now = now,
-            fajrResId = R.string.fajr,
-            zuhrResId = R.string.zuhr,
-            asrResId = R.string.asr,
-            maghribResId = R.string.maghrib,
-            ishaResId = R.string.isha
+            fajrResId = R.string.base_prayer_fajr,
+            zuhrResId = R.string.base_prayer_zuhr,
+            asrResId = R.string.base_prayer_asr,
+            maghribResId = R.string.base_prayer_maghrib,
+            ishaResId = R.string.base_prayer_isha,
         )
 
-        val currentPrayer = info?.let {
-            val total = if (it.endInMinutes > it.startInMinutes) {
-                it.endInMinutes - it.startInMinutes
+        if (info != null) {
+            val total = if (info.endInMinutes > info.startInMinutes) {
+                info.endInMinutes - info.startInMinutes
             } else {
-                (it.endInMinutes + 24 * 60) - it.startInMinutes
+                (info.endInMinutes + 24 * 60) - info.startInMinutes
             }
-            val currentNow = if (now < it.startInMinutes && it.endInMinutes <= it.startInMinutes) {
+            val currentNow = if (now < info.startInMinutes && info.endInMinutes <= info.startInMinutes) {
                 now + 24 * 60
             } else {
                 now
             }
-            val progress = (currentNow - it.startInMinutes).toFloat() / total
-            ActivePrayer(
-                nameResId = it.nameResId,
-                time = it.startTime,
-                startTime = it.startTime,
-                endTime = it.endTime,
-                progress = progress.coerceIn(0f, 1f)
+            val progress = (currentNow - info.startInMinutes).toFloat() / total
+            state = state.copy(
+                currentPrayer = ActivePrayer(
+                    nameResId = info.nameResId,
+                    startTimeRaw = info.startTimeRaw,
+                    endInMinutes = info.endInMinutes,
+                    progress = progress.coerceIn(0f, 1f),
+                ),
             )
+        } else {
+            state = state.copy(currentPrayer = null)
         }
-        state = state.copy(currentPrayer = currentPrayer)
+
+        schedulePrayerEndRefresh()
+    }
+
+    private fun schedulePrayerEndRefresh() {
+        prayerEndJob?.cancel()
+        val endInMinutes = state.currentPrayer?.endInMinutes ?: return
+        val now = TimeUtils.getCurrentTimeInMinutes()
+        val delayMinutes = if (endInMinutes >= now) {
+            endInMinutes + 1 - now
+        } else {
+            endInMinutes + 24 * 60 + 1 - now
+        }
+        prayerEndJob = viewModelScope.launch {
+            delay(delayMinutes * 60_000L)
+            getTiming()
+        }
     }
 }

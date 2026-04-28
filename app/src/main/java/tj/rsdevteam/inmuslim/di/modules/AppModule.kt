@@ -1,13 +1,11 @@
 package tj.rsdevteam.inmuslim.di.modules
 
-import android.content.Context
 import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -17,7 +15,6 @@ import tj.rsdevteam.inmuslim.core.config.BuildType
 import tj.rsdevteam.inmuslim.core.config.BuildVars
 import tj.rsdevteam.inmuslim.data.api.Api
 import tj.rsdevteam.inmuslim.data.constants.Constants
-import tj.rsdevteam.inmuslim.data.preferences.Preferences
 import tj.rsdevteam.inmuslim.data.repositories.ErrorHandler
 import java.util.concurrent.TimeUnit
 
@@ -50,7 +47,7 @@ class AppModule {
 
     @Provides
     fun provideOkhttp(
-        loggingInterceptor: HttpLoggingInterceptor
+        loggingInterceptor: HttpLoggingInterceptor,
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -77,10 +74,5 @@ class AppModule {
     @Provides
     fun provideApi(retrofit: Retrofit): Api {
         return retrofit.create(Api::class.java)
-    }
-
-    @Provides
-    fun providePreferences(@ApplicationContext context: Context): Preferences {
-        return Preferences(context)
     }
 }

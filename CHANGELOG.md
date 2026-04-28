@@ -1,3 +1,17 @@
+1.2.0
+-----
+
+* New Features:
+  * Tasbih feature.
+  * 12 or 24 hour format support.
+  * Real-time prayer UI update on completion.
+* Bug Fixes:
+  * Fixed status bar tint.
+  * Fixed sunset time calculation with Asr.
+* Health:
+  * Update Kotlin, Gradle, and AGP versions.
+  * Update dependencies.
+
 1.1.0
 -----
 

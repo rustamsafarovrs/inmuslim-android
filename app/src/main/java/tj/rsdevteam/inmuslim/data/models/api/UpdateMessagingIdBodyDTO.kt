@@ -10,5 +10,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class UpdateMessagingIdBodyDTO(
     val id: Long,
-    val msgid: String
+    val msgid: String,
 )
