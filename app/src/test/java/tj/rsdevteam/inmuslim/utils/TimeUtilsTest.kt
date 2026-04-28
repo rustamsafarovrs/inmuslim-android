@@ -42,7 +42,7 @@ class TimeUtilsTest {
             asr = "16:00",
             sunset = "19:00",
             maghrib = "19:05",
-            isha = "21:00"
+            isha = "21:00",
         )
 
         // fajrResId=1, zuhrResId=2, asrResId=3, maghribResId=4, ishaResId=5 for testing

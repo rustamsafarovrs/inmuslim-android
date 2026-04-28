@@ -36,7 +36,7 @@ class MessagingService : FirebaseMessagingService() {
             sendNotification(
                 remoteMessage.notification!!.title!!,
                 remoteMessage.notification!!.body!!,
-                remoteMessage
+                remoteMessage,
             )
         }
     }
@@ -48,10 +48,10 @@ class MessagingService : FirebaseMessagingService() {
             this,
             0,
             intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val channelId = getString(R.string.default_notification_channel_id)
+        val channelId = getString(R.string.common_common_push_notifications)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(tj.rsdevteam.inmuslim.R.mipmap.ic_launcher)
             .setContentTitle(title)
@@ -66,7 +66,7 @@ class MessagingService : FirebaseMessagingService() {
             val channel = NotificationChannel(
                 channelId,
                 "Push-notification",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_DEFAULT,
             )
             notificationManager.createNotificationChannel(channel)
         }
@@ -74,7 +74,7 @@ class MessagingService : FirebaseMessagingService() {
             val bitmap = getBitmapFromUrl(remoteMessage.notification!!.imageUrl!!.toString())
             notificationBuilder.setStyle(
                 NotificationCompat.BigPictureStyle()
-                    .bigPicture(bitmap)
+                    .bigPicture(bitmap),
             ).setLargeIcon(bitmap)
         }
         notificationManager.notify(0, notificationBuilder.build())

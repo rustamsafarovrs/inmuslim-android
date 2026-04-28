@@ -9,13 +9,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import tj.rsdevteam.inmuslim.data.models.ErrorBottomSheetConfig
-import tj.rsdevteam.inmuslim.data.models.Resource
+import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.repositories.TimingRepository
 import tj.rsdevteam.inmuslim.data.repositories.UserRepository
 import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.Utils
+import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheetConfig
 import javax.inject.Inject
 
 /**
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class HomeViewModel
 @Inject constructor(
     private val timingRepository: TimingRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeScreenState())
@@ -66,7 +66,7 @@ class HomeViewModel
                             errorBottomSheetConfig = ErrorBottomSheetConfig(
                                 msg = rs.error?.message,
                                 title = "Error",
-                            )
+                            ),
                         )
                     }
                 }
@@ -132,11 +132,11 @@ class HomeViewModel
         val info = TimeUtils.findCurrentPrayer(
             timing = timing,
             now = now,
-            fajrResId = R.string.fajr,
-            zuhrResId = R.string.zuhr,
-            asrResId = R.string.asr,
-            maghribResId = R.string.maghrib,
-            ishaResId = R.string.isha
+            fajrResId = R.string.base_prayer_fajr,
+            zuhrResId = R.string.base_prayer_zuhr,
+            asrResId = R.string.base_prayer_asr,
+            maghribResId = R.string.base_prayer_maghrib,
+            ishaResId = R.string.base_prayer_isha,
         )
 
         if (info != null) {
@@ -156,8 +156,8 @@ class HomeViewModel
                     nameResId = info.nameResId,
                     startTimeRaw = info.startTimeRaw,
                     endInMinutes = info.endInMinutes,
-                    progress = progress.coerceIn(0f, 1f)
-                )
+                    progress = progress.coerceIn(0f, 1f),
+                ),
             )
         } else {
             state = state.copy(currentPrayer = null)

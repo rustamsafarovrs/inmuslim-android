@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings">Настройки</string>
-    <string name="fajr">Фаджр</string>
-    <string name="sunrise">Восход</string>
-    <string name="zuhr">Зухр</string>
-    <string name="asr">Аср</string>
-    <string name="sunset">Закат</string>
-    <string name="maghrib">Магриб</string>
-    <string name="isha">Иша</string>
-    <string name="change_region">Изменить регион</string>
-    <string name="change_region_desc">Сменить регион в другой</string>
-    <string name="select_region_title">Выберите регион или город</string>
-    <string name="timing_source">Время молитв взято с сайта shuroiulamo.tj</string>
-    <string name="change_language">Изменить язык</string>
-    <string name="change_language_desc">Выбрать язык приложения</string>
-    <string name="general">Общие</string>
-    <string name="error_title">Ошибка</string>
-    <string name="current_prayer_time">Текущее время молитвы</string>
+    <!-- Base -->
+    <string name="base_prayer_fajr">Фаджр</string>
+    <string name="base_prayer_sunrise">Восход</string>
+    <string name="base_prayer_zuhr">Зухр</string>
+    <string name="base_prayer_asr">Аср</string>
+    <string name="base_prayer_sunset">Закат</string>
+    <string name="base_prayer_maghrib">Магриб</string>
+    <string name="base_prayer_isha">Иша</string>
+    <string name="base_title_current_prayer">Текущее время молитвы</string>
+    <string name="base_title_select_region">Выберите регион или город</string>
+    <string name="base_action_change_region">Изменить регион</string>
+    <string name="base_description_change_region">Сменить регион в другой</string>
+    <string name="base_description_timing_source">Время молитв взято с сайта shuroiulamo.tj</string>
+
+    <!-- Common -->
+    <string name="common_common_error_title">Ошибка</string>
+    <string name="common_title_settings">Настройки</string>
+    <string name="common_title_general">Общие</string>
+    <string name="common_action_cancel">Отмена</string>
+    <string name="common_action_add">Добавить</string>
+    <string name="common_action_change_language">Изменить язык</string>
+    <string name="common_description_change_language">Выбрать язык приложения</string>
+
+    <!-- Tasbih -->
+    <string name="tasbih_title_tasbih">Тасбих</string>
+    <string name="tasbih_title_list">Список тасбих</string>
+    <string name="tasbih_title_history">История</string>
+    <string name="tasbih_action_add_tasbih">Добавить тасбих</string>
+    <string name="tasbih_action_reset">Сбросить</string>
+    <string name="tasbih_action_haptic_enable">Включить вибрацию</string>
+    <string name="tasbih_action_haptic_disable">Отключить вибрацию</string>
+    <string name="tasbih_title_reset_confirm">Сбросить счёт?</string>
+    <string name="tasbih_description_reset_confirm">Счёт за сегодня будет обнулён. Это действие нельзя отменить.</string>
+    <string name="tasbih_hint_name">Название тасбиха</string>
+    <string name="tasbih_description_tap_to_count">Нажмите для подсчёта</string>
+    <string name="tasbih_other_empty">Тасбих не добавлен</string>
+    <string name="tasbih_other_add_first">Добавьте первый тасбих</string>
+    <string name="tasbih_other_no_history">История отсутствует</string>
 </resources>

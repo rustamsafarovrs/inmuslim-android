@@ -11,5 +11,5 @@ import com.squareup.moshi.JsonClass
 data class RegisterUserDTO(
     val result: Int,
     val msg: String,
-    val id: Long
+    val id: Long,
 )

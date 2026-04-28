@@ -15,5 +15,5 @@ data class TimingDTO(
     val asr: String,
     val sunset: String,
     val maghrib: String,
-    val isha: String
+    val isha: String,
 )

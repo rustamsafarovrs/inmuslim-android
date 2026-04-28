@@ -19,6 +19,9 @@ import tj.rsdevteam.inmuslim.core.router.LocalRouter
 import tj.rsdevteam.inmuslim.core.router.Router
 import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.calculator.TasbihScreen
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.history.TasbihHistoryScreen
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.list.TasbihListScreen
 import tj.rsdevteam.inmuslim.ui.home.HomeScreen
 import tj.rsdevteam.inmuslim.ui.region.RegionScreen
 import tj.rsdevteam.inmuslim.ui.settings.SettingsScreen
@@ -39,7 +42,7 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(LocalRouter provides router) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.background,
                     ) {
                         Navigation(startDestination)
                     }
@@ -53,15 +56,12 @@ class MainActivity : ComponentActivity() {
 fun Navigation(startDestination: Screen) {
     val router = LocalRouter.current
     NavHost(navController = router.controller, startDestination = startDestination) {
-        composable<Screen.Regions> {
-            RegionScreen()
-        }
-        composable<Screen.Main> {
-            HomeScreen()
-        }
-        composable<Screen.Settings> {
-            SettingsScreen()
-        }
+        composable<Screen.Regions> { RegionScreen() }
+        composable<Screen.Main> { HomeScreen() }
+        composable<Screen.Settings> { SettingsScreen() }
+        composable<Screen.TasbihList> { TasbihListScreen() }
+        composable<Screen.TasbihCalculator> { TasbihScreen() }
+        composable<Screen.TasbihHistory> { TasbihHistoryScreen() }
     }
 }
 

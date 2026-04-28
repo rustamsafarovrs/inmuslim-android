@@ -14,6 +14,8 @@
     <ID>MagicNumber:TimeUtils.kt$TimeUtils$12</ID>
     <ID>MagicNumber:HomeViewModel.kt$HomeViewModel$60_000L</ID>
     <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun SettingsScreen( didClickBack: () -> Unit, didClickRegion: () -> Unit, didClickLanguage: () -> Unit )</ID>
+    <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun SettingsScreen( didClickBack: () -> Unit, didClickRegion: () -> Unit, didClickLanguage: () -> Unit, )</ID>
+    <ID>LongMethod:ErrorBottomSheet.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ErrorBottomSheet( sheetState: SheetState, errorBottomSheetConfig: ErrorBottomSheetConfig, dismiss: () -> Unit, )</ID>
   </ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ArgumentListWrapping:HomeScreens.kt$( title = { Text(text = stringResource(id = R.string.app_name)) }, actions = { IconButton(onClick = { navigateToSettings.invoke() }) { Icon(imageVector = Icons.Outlined.Settings, contentDescription = "Settings") } })</ID>

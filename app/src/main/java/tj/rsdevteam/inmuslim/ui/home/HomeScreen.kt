@@ -41,12 +41,12 @@ import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Timing
 import tj.rsdevteam.inmuslim.res.R
-import tj.rsdevteam.inmuslim.ui.common.ErrorBottomSheet
-import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
 import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.findActivity
 import tj.rsdevteam.inmuslim.utils.is24HourFormat
 import tj.rsdevteam.inmuslim.utils.launchInAppReview
+import tj.rstech.uicomponents.ProgressIndicator
+import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheet
 
 /**
  * Created by Rustam Safarov on 8/13/23.
@@ -68,7 +68,8 @@ fun HomeScreen() {
     HomeScreen(
         state = viewModel.state,
         didClickSettings = { router.navigate(Screen.Settings) },
-        handleEvent = { viewModel.handleEvent(it) }
+        didClickTasbih = { router.navigate(Screen.TasbihList) },
+        handleEvent = { viewModel.handleEvent(it) },
     )
 }
 
@@ -77,7 +78,8 @@ fun HomeScreen() {
 private fun HomeScreen(
     state: HomeScreenState,
     didClickSettings: () -> Unit,
-    handleEvent: (HomeUIEvent) -> Unit
+    didClickTasbih: () -> Unit,
+    handleEvent: (HomeUIEvent) -> Unit,
 ) {
     val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -86,12 +88,18 @@ private fun HomeScreen(
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
+                    IconButton(onClick = didClickTasbih) {
+                        Icon(
+                            painterResource(R.drawable.ic_tasbih_24),
+                            contentDescription = stringResource(R.string.tasbih_title_tasbih),
+                        )
+                    }
                     IconButton(onClick = didClickSettings) {
                         Icon(painterResource(R.drawable.ic_settings_24), contentDescription = "Settings")
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         val scrollState = rememberScrollState()
         val is24Hour = LocalContext.current.is24HourFormat()
@@ -103,7 +111,7 @@ private fun HomeScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 20.dp)
                 .fillMaxSize()
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState),
         ) {
             if (state.timing != null) {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -121,7 +129,7 @@ private fun HomeScreen(
         ErrorBottomSheet(
             sheetState = errorState,
             errorBottomSheetConfig = state.errorBottomSheetConfig!!,
-            dismiss = { handleEvent(HomeUIEvent.DismissDialog) }
+            dismiss = { handleEvent(HomeUIEvent.DismissDialog) },
         )
     }
 }
@@ -134,18 +142,18 @@ private fun CurrentPrayerCard(activePrayer: ActivePrayer, is24Hour: Boolean) {
             .clip(shape = InmuslimShapes.large)
             .background(MaterialTheme.colorScheme.primary)
             .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = stringResource(id = R.string.current_prayer_time),
+            text = stringResource(id = R.string.base_title_current_prayer),
             style = InmuslimTypo.titleSmall,
-            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(id = activePrayer.nameResId),
             style = InmuslimTypo.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Box(contentAlignment = Alignment.Center) {
@@ -160,12 +168,12 @@ private fun CurrentPrayerCard(activePrayer: ActivePrayer, is24Hour: Boolean) {
                 Text(
                     text = TimeUtils.formatTime(activePrayer.startTimeRaw, is24Hour),
                     style = InmuslimTypo.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimary,
                 )
                 Text(
                     text = TimeUtils.formatMinutes(activePrayer.endInMinutes, is24Hour),
                     style = InmuslimTypo.titleSmall,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                 )
             }
         }
@@ -176,45 +184,45 @@ private fun CurrentPrayerCard(activePrayer: ActivePrayer, is24Hour: Boolean) {
 private fun TimeItems(timing: Timing, currentPrayerResId: Int?, is24Hour: Boolean) {
     Column {
         TimeItem(
-            title = stringResource(R.string.fajr),
+            title = stringResource(R.string.base_prayer_fajr),
             start = TimeUtils.formatTime(timing.fajr, is24Hour),
-            isSelected = currentPrayerResId == R.string.fajr
+            isSelected = currentPrayerResId == R.string.base_prayer_fajr,
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
-            title = stringResource(R.string.sunrise),
+            title = stringResource(R.string.base_prayer_sunrise),
             start = TimeUtils.formatTime(timing.sunrise, is24Hour),
-            isSelected = false
+            isSelected = false,
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
-            title = stringResource(R.string.zuhr),
+            title = stringResource(R.string.base_prayer_zuhr),
             start = TimeUtils.formatTime(timing.zuhr, is24Hour),
-            isSelected = currentPrayerResId == R.string.zuhr
+            isSelected = currentPrayerResId == R.string.base_prayer_zuhr,
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
-            title = stringResource(R.string.asr),
+            title = stringResource(R.string.base_prayer_asr),
             start = TimeUtils.formatTime(timing.asr, is24Hour),
-            isSelected = currentPrayerResId == R.string.asr
+            isSelected = currentPrayerResId == R.string.base_prayer_asr,
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
-            title = stringResource(R.string.sunset),
+            title = stringResource(R.string.base_prayer_sunset),
             start = TimeUtils.formatTime(timing.sunset, is24Hour),
-            isSelected = false
+            isSelected = false,
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
-            title = stringResource(R.string.maghrib),
+            title = stringResource(R.string.base_prayer_maghrib),
             start = TimeUtils.formatTime(timing.maghrib, is24Hour),
-            isSelected = currentPrayerResId == R.string.maghrib
+            isSelected = currentPrayerResId == R.string.base_prayer_maghrib,
         )
         Spacer(modifier = Modifier.height(12.dp))
         TimeItem(
-            title = stringResource(R.string.isha),
+            title = stringResource(R.string.base_prayer_isha),
             start = TimeUtils.formatTime(timing.isha, is24Hour),
-            isSelected = currentPrayerResId == R.string.isha
+            isSelected = currentPrayerResId == R.string.base_prayer_isha,
         )
     }
 }
@@ -238,18 +246,18 @@ private fun TimeItem(title: String, start: String, isSelected: Boolean = false) 
             .clip(shape = InmuslimShapes.large)
             .background(backgroundColor)
             .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = title,
             style = InmuslimTypo.titleMedium,
-            color = contentColor
+            color = contentColor,
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = start,
             style = InmuslimTypo.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-            color = contentColor
+            color = contentColor,
         )
     }
 }
@@ -267,17 +275,18 @@ private fun HomeScreenFajrPreview() {
                     asr = "16:00",
                     sunset = "18:30",
                     maghrib = "18:45",
-                    isha = "20:00"
+                    isha = "20:00",
                 ),
                 currentPrayer = ActivePrayer(
-                    nameResId = R.string.fajr,
+                    nameResId = R.string.base_prayer_fajr,
                     startTimeRaw = "05:00",
                     endInMinutes = 6 * 60 + 30,
-                    progress = 0.3f
-                )
+                    progress = 0.3f,
+                ),
             ),
             didClickSettings = {},
-            handleEvent = {}
+            didClickTasbih = {},
+            handleEvent = {},
         )
     }
 }
@@ -295,17 +304,18 @@ private fun HomeScreenAsrPreview() {
                     asr = "16:00",
                     sunset = "18:30",
                     maghrib = "18:45",
-                    isha = "20:00"
+                    isha = "20:00",
                 ),
                 currentPrayer = ActivePrayer(
-                    nameResId = R.string.asr,
+                    nameResId = R.string.base_prayer_asr,
                     startTimeRaw = "16:00",
                     endInMinutes = 18 * 60 + 30,
-                    progress = 0.6f
-                )
+                    progress = 0.6f,
+                ),
             ),
             didClickSettings = {},
-            handleEvent = {}
+            didClickTasbih = {},
+            handleEvent = {},
         )
     }
 }
@@ -323,17 +333,18 @@ private fun HomeScreenMaghribPreview() {
                     asr = "16:00",
                     sunset = "18:30",
                     maghrib = "18:45",
-                    isha = "20:00"
+                    isha = "20:00",
                 ),
                 currentPrayer = ActivePrayer(
-                    nameResId = R.string.maghrib,
+                    nameResId = R.string.base_prayer_maghrib,
                     startTimeRaw = "18:45",
                     endInMinutes = 20 * 60,
-                    progress = 0.4f
-                )
+                    progress = 0.4f,
+                ),
             ),
             didClickSettings = {},
-            handleEvent = {}
+            didClickTasbih = {},
+            handleEvent = {},
         )
     }
 }
@@ -351,12 +362,13 @@ private fun HomeScreenNoPrayerPreview() {
                     asr = "16:00",
                     sunset = "18:30",
                     maghrib = "18:45",
-                    isha = "20:00"
+                    isha = "20:00",
                 ),
-                currentPrayer = null
+                currentPrayer = null,
             ),
             didClickSettings = {},
-            handleEvent = {}
+            didClickTasbih = {},
+            handleEvent = {},
         )
     }
 }

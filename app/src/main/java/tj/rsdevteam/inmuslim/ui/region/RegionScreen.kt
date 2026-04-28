@@ -34,10 +34,10 @@ import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.ui.MainActivity
-import tj.rsdevteam.inmuslim.ui.common.ErrorBottomSheet
-import tj.rsdevteam.inmuslim.ui.common.PrimaryButton
-import tj.rsdevteam.inmuslim.ui.common.ProgressIndicator
 import tj.rsdevteam.inmuslim.utils.findActivity
+import tj.rstech.uicomponents.PrimaryButton
+import tj.rstech.uicomponents.ProgressIndicator
+import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheet
 
 /**
  * Created by Rustam Safarov on 14/08/23.
@@ -63,7 +63,7 @@ fun RegionScreen() {
             } else {
                 router.navigateAsRoot(Screen.Main)
             }
-        }
+        },
     )
 }
 
@@ -74,14 +74,14 @@ private fun RegionScreen(
     showBackButton: Boolean,
     handleEvent: (RegionUIEvent) -> Unit,
     didClickBack: () -> Unit,
-    didSelect: () -> Unit
+    didSelect: () -> Unit,
 ) {
     val errorState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Column(
         modifier = Modifier
             .statusBarsPadding()
-            .navigationBarsPadding()
+            .navigationBarsPadding(),
     ) {
         if (showBackButton) {
             IconButton(onClick = didClickBack, modifier = Modifier.padding(4.dp)) {
@@ -93,9 +93,9 @@ private fun RegionScreen(
         } else {
             Spacer(modifier = Modifier.height(if (showBackButton) 8.dp else 30.dp))
             Text(
-                text = stringResource(R.string.select_region_title),
+                text = stringResource(R.string.base_title_select_region),
                 style = InmuslimTypo.titleLarge,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
             )
             Spacer(modifier = Modifier.height(20.dp))
             Regions(
@@ -105,7 +105,7 @@ private fun RegionScreen(
                 handleEvent(RegionUIEvent.DidSelectRegion(it))
             }
             Spacer(modifier = Modifier.height(12.dp))
-            PrimaryButton(text = "OK") {
+            PrimaryButton(title = "OK") {
                 handleEvent(RegionUIEvent.DidClickConfirm)
                 didSelect.invoke()
             }
@@ -117,7 +117,7 @@ private fun RegionScreen(
         ErrorBottomSheet(
             sheetState = errorState,
             errorBottomSheetConfig = state.sheetConfig!!,
-            dismiss = { handleEvent(RegionUIEvent.DismissDialog) }
+            dismiss = { handleEvent(RegionUIEvent.DismissDialog) },
         )
     }
 }
@@ -132,7 +132,7 @@ private fun Regions(list: List<Region>, modifier: Modifier = Modifier, didClick:
                     .clickable { didClick.invoke(region) }
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
-                    .defaultMinSize(minHeight = 50.dp)
+                    .defaultMinSize(minHeight = 50.dp),
             ) {
                 Text(text = region.name, style = InmuslimTypo.labelLarge)
                 Spacer(modifier = Modifier.weight(1f))
@@ -153,13 +153,13 @@ private fun RegionScreenPreview() {
                 list = listOf(
                     Region(0, "Dushanbe"),
                     Region(1, "Khujand"),
-                    Region(2, "Bokhtar")
-                )
+                    Region(2, "Bokhtar"),
+                ),
             ),
             showBackButton = false,
             handleEvent = {},
             didClickBack = {},
-            didSelect = {}
+            didSelect = {},
         )
     }
 }

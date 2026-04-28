@@ -9,6 +9,7 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+**/build/
 /captures
 .externalNativeBuild
 .cxx
@@ -22,3 +23,5 @@ local.properties
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/codeStyles/Project.xml
 .kotlin/
+/.idea/planningMode.xml
+/.idea/inspectionProfiles/Project_Default.xml

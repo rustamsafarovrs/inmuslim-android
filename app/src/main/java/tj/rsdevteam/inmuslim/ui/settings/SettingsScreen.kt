@@ -62,7 +62,7 @@ fun SettingsScreen() {
     SettingsScreen(
         didClickBack = { router.navigateUp() },
         didClickRegion = { router.navigate(Screen.Regions) },
-        didClickLanguage = { Utils.openLanguageSettings(context) }
+        didClickLanguage = { Utils.openLanguageSettings(context) },
     )
 }
 
@@ -71,7 +71,7 @@ fun SettingsScreen() {
 private fun SettingsScreen(
     didClickBack: () -> Unit,
     didClickRegion: () -> Unit,
-    didClickLanguage: () -> Unit
+    didClickLanguage: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -80,8 +80,8 @@ private fun SettingsScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.settings),
-                        style = InmuslimTypo.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                        text = stringResource(id = R.string.common_title_settings),
+                        style = InmuslimTypo.headlineMedium.copy(fontWeight = FontWeight.Bold),
                     )
                 },
                 navigationIcon = {
@@ -89,35 +89,35 @@ private fun SettingsScreen(
                         Icon(
                             painterResource(R.drawable.ic_arrow_back_24),
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
-                )
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                ),
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .verticalScroll(state = rememberScrollState())
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = stringResource(R.string.general).uppercase(),
+                text = stringResource(R.string.common_title_general).uppercase(),
                 style = InmuslimTypo.labelLarge.copy(
                     color = MaterialTheme.colorScheme.primary,
-                    letterSpacing = 1.sp
+                    letterSpacing = 1.sp,
                 ),
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
             )
 
             Card(
@@ -126,23 +126,23 @@ private fun SettingsScreen(
                     .fillMaxWidth(),
                 shape = InmuslimShapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             ) {
                 Column {
                     SettingItem(
                         icon = ImageVector.vectorResource(R.drawable.ic_location_on_24),
-                        title = stringResource(R.string.change_region),
-                        desc = stringResource(R.string.change_region_desc),
+                        title = stringResource(R.string.base_action_change_region),
+                        desc = stringResource(R.string.base_description_change_region),
                         didClick = didClickRegion,
-                        showDivider = true
+                        showDivider = true,
                     )
                     SettingItem(
                         icon = ImageVector.vectorResource(R.drawable.ic_dictionary_24),
-                        title = stringResource(R.string.change_language),
-                        desc = stringResource(R.string.change_language_desc),
-                        didClick = didClickLanguage
+                        title = stringResource(R.string.common_action_change_language),
+                        desc = stringResource(R.string.common_description_change_language),
+                        didClick = didClickLanguage,
                     )
                 }
             }
@@ -155,28 +155,28 @@ private fun SettingsScreen(
                     .fillMaxWidth(),
                 shape = InmuslimShapes.large,
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f),
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_brightness_alert_24),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = stringResource(R.string.timing_source),
+                        text = stringResource(R.string.base_description_timing_source),
                         style = InmuslimTypo.bodyMedium.copy(
                             lineHeight = 20.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                         ),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
@@ -187,7 +187,7 @@ private fun SettingsScreen(
                 text = "Version ${tj.rsdevteam.inmuslim.BuildConfig.VERSION_NAME}",
                 style = InmuslimTypo.labelSmall,
                 color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -200,7 +200,7 @@ private fun SettingItem(
     icon: ImageVector,
     title: String,
     desc: String,
-    showDivider: Boolean = false
+    showDivider: Boolean = false,
 ) {
     Column {
         Row(
@@ -208,20 +208,20 @@ private fun SettingItem(
                 .fillMaxWidth()
                 .clickable { didClick.invoke() }
                 .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(22.dp),
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -230,15 +230,15 @@ private fun SettingItem(
                     text = title,
                     style = InmuslimTypo.titleMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
                     ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 if (desc.isNotEmpty()) {
                     Text(
                         text = desc,
                         style = InmuslimTypo.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -248,14 +248,14 @@ private fun SettingItem(
                 tint = MaterialTheme.colorScheme.outline,
                 modifier = Modifier
                     .size(20.dp)
-                    .rotate(180f)
+                    .rotate(180f),
             )
         }
         if (showDivider) {
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 thickness = 0.5.dp,
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
             )
         }
     }
@@ -268,7 +268,7 @@ private fun SettingsScreenPreview() {
         SettingsScreen(
             didClickBack = {},
             didClickRegion = {},
-            didClickLanguage = {}
+            didClickLanguage = {},
         )
     }
 }

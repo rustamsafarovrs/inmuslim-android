@@ -3,9 +3,9 @@ package tj.rsdevteam.inmuslim.data.repositories
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.api.Api
 import tj.rsdevteam.inmuslim.data.models.Message
-import tj.rsdevteam.inmuslim.data.models.Resource
 import tj.rsdevteam.inmuslim.data.models.User
 import tj.rsdevteam.inmuslim.data.models.api.RegisterUserBodyDTO
 import tj.rsdevteam.inmuslim.data.models.api.UpdateMessagingIdBodyDTO
@@ -25,7 +25,7 @@ class UserRepository
 @Inject constructor(
     private val api: Api,
     private val preferences: Preferences,
-    private val errorHandler: ErrorHandler
+    private val errorHandler: ErrorHandler,
 ) {
 
     fun registerUser(name: String): Flow<Resource<User>> = flow {

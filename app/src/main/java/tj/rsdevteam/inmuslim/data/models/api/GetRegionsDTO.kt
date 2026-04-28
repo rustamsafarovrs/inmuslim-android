@@ -11,5 +11,5 @@ import com.squareup.moshi.JsonClass
 data class GetRegionsDTO(
     val result: Int,
     val msg: String,
-    val regions: List<RegionDTO>
+    val regions: List<RegionDTO>,
 )

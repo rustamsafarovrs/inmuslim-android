@@ -15,5 +15,5 @@ object BuildVars {
 
 enum class BuildType {
     TEST,
-    PROD
+    PROD,
 }

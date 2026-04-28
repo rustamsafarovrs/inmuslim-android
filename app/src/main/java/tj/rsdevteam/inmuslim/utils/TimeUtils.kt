@@ -43,7 +43,7 @@ object TimeUtils {
         val nameResId: Int,
         val startTimeRaw: String,
         val startInMinutes: Int,
-        val endInMinutes: Int
+        val endInMinutes: Int,
     )
 
     @Suppress("LongParameterList")
@@ -54,7 +54,7 @@ object TimeUtils {
         zuhrResId: Int,
         asrResId: Int,
         maghribResId: Int,
-        ishaResId: Int
+        ishaResId: Int,
     ): PrayerInfo? {
         val f = timeToMinutes(timing.fajr)
         val sr = timeToMinutes(timing.sunrise)
