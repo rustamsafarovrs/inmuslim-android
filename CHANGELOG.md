@@ -2,7 +2,8 @@
 
 ## 1.3.0
 
-
+* Bug Fixes:
+  * Fix tasbih haptic.
 
 ## 1.2.0
 

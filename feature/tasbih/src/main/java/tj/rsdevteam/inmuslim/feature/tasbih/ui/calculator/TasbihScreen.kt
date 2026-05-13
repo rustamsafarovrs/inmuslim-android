@@ -269,7 +269,7 @@ fun performStrongHaptic(context: Context, state: TasbihScreenState) {
     val timings = longArrayOf(0, 200, 100, 200, 100, 400)
     val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255)
 
-    if (state.hapticEnabled || isHundredCount) {
+    if (state.hapticEnabled || isHundredCount || isSpecialCount) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val effect = when {
                 isHundredCount -> VibrationEffect.createWaveform(timings, amplitudes, -1)
