@@ -1,5 +1,10 @@
-1.2.0
------
+# WinGo Changelog
+
+## 1.3.0
+
+
+
+## 1.2.0
 
 * New Features:
   * Tasbih feature.
@@ -12,8 +17,7 @@
   * Update Kotlin, Gradle, and AGP versions.
   * Update dependencies.
 
-1.1.0
------
+## 1.1.0
 
 * New Features:
   * Current prayer time feature.
@@ -27,25 +31,21 @@
   * Update google services config file.
   * Init project with core and update dependencies.
 
-1.0.3
------
+## 1.0.3
 
 * Bug Fixes:
   * Fixed Confirm button position in Select Region screen.
 
-1.0.2
------
+## 1.0.2
 
 * Updates:
   * Changed http to https in API url.
 
-1.0.1
------
+## 1.0.1
 
 * Bug Fixes:
   * Fixed base URL.
 
-1.0.0
------
+## 1.0.0
 
 Initial release.
