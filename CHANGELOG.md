@@ -2,8 +2,12 @@
 
 ## 1.3.0
 
+* Updates:
+  * Disable user registration in test builds.
 * Bug Fixes:
   * Fix tasbih haptic.
+* Health:
+  * Update dependency versions.
 
 ## 1.2.0
 
