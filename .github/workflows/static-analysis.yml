@@ -1,8 +1,5 @@
 name: static analysis
-on:
-    push:
-        branches: [ master, develop ]
-    pull_request:
+on: push
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
