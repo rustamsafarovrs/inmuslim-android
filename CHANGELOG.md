@@ -2,7 +2,15 @@
 
 ## 1.4.0
 
-
+* New Features:
+  * Tasbih history.
+  * In-app update.
+  * Analytics events tracking.
+* Health:
+  * Update SDK, Gradle and dependencies.
+  * Update to JDK 21.
+  * New unit test and static analysis workflows.
+  * Pre-commit hook runs detekt and lint.
 
 ## 1.3.0
 
