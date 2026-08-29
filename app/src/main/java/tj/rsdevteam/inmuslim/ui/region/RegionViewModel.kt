@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsProperty
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.data.repositories.RegionRepository
@@ -21,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegionViewModel
 @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val regionRepository: RegionRepository,
 ) : ViewModel() {
 
@@ -36,8 +40,13 @@ class RegionViewModel
             regionRepository.getRegions().collect { rs ->
                 when (rs) {
                     is Resource.InProgress -> Unit
-                    is Resource.Success -> state = state.copy(list = rs.data)
+                    is Resource.Success -> {
+                        analytics.log(AnalyticsEvent.RegionsLoaded(rs.data.size))
+                        state = state.copy(list = rs.data)
+                    }
+
                     is Resource.Error -> {
+                        analytics.log(AnalyticsEvent.RegionsLoadFailed(rs.error?.message))
                         state = state.copy(
                             sheetConfig = ErrorBottomSheetConfig(
                                 msg = rs.error?.message,
@@ -63,11 +72,14 @@ class RegionViewModel
     private fun handleDidConfirm() {
         val r = state.list.firstOrNull { it.selected.value }
         if (r != null) {
+            analytics.log(AnalyticsEvent.RegionConfirmed(r.id))
+            analytics.setUserProperty(AnalyticsProperty.REGION_ID, r.id.toString())
             regionRepository.saveRegionId(r.id)
         }
     }
 
     private fun handleDidSelectRegion(region: Region) {
+        analytics.log(AnalyticsEvent.RegionSelected(region.id))
         state.list.forEach {
             if (it != region) {
                 it.selected.value = false

@@ -19,8 +19,8 @@ android {
         applicationId = "tj.rsdevteam.inmuslim"
         minSdk = libs.versions.androidMinSdk.get().toInt()
         targetSdk = libs.versions.androidSdk.get().toInt()
-        versionCode = 8
-        versionName = "1.3.0"
+        versionCode = 9
+        versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
         manifestPlaceholders["appName"] = "@string/app_name"
@@ -125,6 +125,8 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 
     implementation(libs.google.play.review.ktx)
+    implementation(libs.google.play.app.update.ktx)
+    implementation(project(":analytics"))
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":res"))

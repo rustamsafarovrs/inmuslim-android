@@ -1,33 +1,41 @@
 #!/usr/bin/env bash
+set -u
 
-echo "Running detekt check..."
-DETEKT_OUTPUT="/tmp/detekt-$(date +%s)"
-./gradlew detekt > "$DETEKT_OUTPUT"
-DETEKT_EXIT=$?
+# Emergency escape hatch: SKIP_HOOKS=1 git commit ...
+if [ "${SKIP_HOOKS:-0}" != "0" ]; then
+  echo "SKIP_HOOKS is set — skipping detekt and lint."
+  exit 0
+fi
 
-if [ $DETEKT_EXIT -ne 0 ]; then
-  cat "$DETEKT_OUTPUT"
-  rm "$DETEKT_OUTPUT"
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+OUTPUT="$(mktemp -t inmuslim-hook)"
+trap 'rm -f "$OUTPUT"' EXIT
+
+banner() {
   echo "***********************************************"
-  echo "                 detekt failed                 "
+  printf '%s\n' "$1"
   echo " Please fix the above issues before committing "
   echo "***********************************************"
-  exit $DETEKT_EXIT
-fi
-rm "$DETEKT_OUTPUT"
+}
 
-echo "Running Android Lint check..."
-LINT_OUTPUT="/tmp/lint-$(date +%s)"
-./gradlew lint > "$LINT_OUTPUT"
-LINT_EXIT=$?
+# run_check <human name> <gradle task...>
+run_check() {
+  local name="$1"
+  shift
 
-if [ $LINT_EXIT -ne 0 ]; then
-  cat "$LINT_OUTPUT"
-  rm "$LINT_OUTPUT"
-  echo "***********************************************"
-  echo "                  lint failed                  "
-  echo " Please fix the above issues before committing "
-  echo "***********************************************"
-  exit $LINT_EXIT
-fi
-rm "$LINT_OUTPUT"
+  echo "Running $name check..."
+  ./gradlew "$@" > "$OUTPUT" 2>&1
+  local code=$?
+
+  if [ $code -ne 0 ]; then
+    cat "$OUTPUT"
+    banner "                 $name failed"
+    exit $code
+  fi
+}
+
+run_check "detekt" detekt
+run_check "lint" lint
+
+exit 0

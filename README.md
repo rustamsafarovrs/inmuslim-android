@@ -31,9 +31,9 @@ Follow these steps to set up and compile the project on your local machine:
      RELEASE_STORE_PASSWORD=your_store_password
      ```
 4. **Configure Firebase (Optional):**
-   The repository already includes `google-services.json`. If you want to use your own Firebase project, replace `app/google-services.json` and `app/src/debug/google-services.json` with your own files.
+   The repository already includes `app/google-services.json`. If you want to use your own Firebase project, replace that file with your own. Debug builds use the same file — they apply the `.beta` application ID suffix, so register `tj.rsdevteam.inmuslim.beta` in your Firebase project as well.
 5. **Open in Android Studio:**
-   - Use **Android Studio Giraffe (2022.3.1)** or newer.
+   - Use the **latest stable Android Studio** — the project builds with AGP 9.3.1 and Kotlin 2.3.21, which older releases cannot open.
    - Open the project from the root directory (choose **Open**, do NOT use **Import**).
 6. **Build and Run:**
    - Wait for Gradle to sync.
@@ -57,20 +57,35 @@ Follow these steps to set up and compile the project on your local machine:
 
 ### Local Persistence
 
-- Shared Preferences
+- Room (tasbih dhikr counters and history)
+- Shared Preferences (selected region, user id, FCM token, settings)
 
 ### Other
 
 - Firebase Crashlytics (crashes, logging)
+- Firebase Analytics (events, via the `:analytics` module)
+- Firebase Cloud Messaging (push notifications)
+- Play In-App Review and In-App Update
+- detekt + Android Lint (static analysis)
 
 ### CI/CD
 
-_Soon..._
+GitHub Actions runs on every push and pull request:
+
+| Workflow                                    | Job      | Command                       |
+|---------------------------------------------|----------|-------------------------------|
+| `.github/workflows/static-analysis.yml`     | `detekt` | `./gradlew detekt`            |
+| `.github/workflows/static-analysis.yml`     | `lint`   | `./gradlew lint`              |
+| `.github/workflows/test-action.yml`         | `test`   | `./gradlew testDebugUnitTest` |
+
+All three jobs run on JDK 21 and upload their reports as build artifacts. The `installGitHooks`
+pre-commit hook runs `detekt` and `lint` locally so failures surface before they reach CI.
 
 ## Project Requirements
 
-- Java 17
-- Android Studio Giraffe (2022.3.1) (for easy download - [JetBrains Toolbox](https://www.jetbrains.com/toolbox-app/))
+- JDK 21
+- Android SDK 37 (min SDK 24)
+- Latest stable Android Studio (for easy download - [JetBrains Toolbox](https://www.jetbrains.com/toolbox-app/))
 
 ## Contributing
 

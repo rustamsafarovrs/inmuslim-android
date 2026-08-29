@@ -13,6 +13,8 @@
     <string name="base_action_change_region">Change region</string>
     <string name="base_description_change_region">Change to another region</string>
     <string name="base_description_timing_source">Prayer timings are taken from shuroiulamo.tj</string>
+    <string name="base_description_update_downloaded">An app update has been downloaded</string>
+    <string name="base_action_update_install">Install</string>
 
     <!-- Common -->
     <string name="common_common_error_title">Error</string>
@@ -22,6 +24,8 @@
     <string name="common_action_add">Add</string>
     <string name="common_action_change_language">Change language</string>
     <string name="common_description_change_language">Select app language</string>
+    <string name="common_other_today">Today</string>
+    <string name="common_other_yesterday">Yesterday</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Tasbih</string>
@@ -38,4 +42,9 @@
     <string name="tasbih_other_empty">No tasbih added yet</string>
     <string name="tasbih_other_add_first">Add your first tasbih</string>
     <string name="tasbih_other_no_history">No history yet</string>
+    <string name="tasbih_title_all_history">All history</string>
+    <string name="tasbih_other_total">Total</string>
+    <string name="tasbih_other_days">Days</string>
+    <string name="tasbih_other_best">Best</string>
+    <string name="tasbih_description_no_history">The tasbih you count will show up here</string>
 </resources>

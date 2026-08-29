@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import tj.rsdevteam.inmuslim.core.router.LocalRouter
 import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimShapes
@@ -58,11 +59,18 @@ import tj.rsdevteam.inmuslim.utils.Utils
 fun SettingsScreen() {
     val router = LocalRouter.current
     val context = LocalContext.current
+    val viewModel: SettingsViewModel = hiltViewModel()
 
     SettingsScreen(
         didClickBack = { router.navigateUp() },
-        didClickRegion = { router.navigate(Screen.Regions) },
-        didClickLanguage = { Utils.openLanguageSettings(context) },
+        didClickRegion = {
+            viewModel.handleEvent(SettingsUIEvent.DidClickRegion)
+            router.navigate(Screen.Regions)
+        },
+        didClickLanguage = {
+            viewModel.handleEvent(SettingsUIEvent.DidClickLanguage)
+            Utils.openLanguageSettings(context)
+        },
     )
 }
 

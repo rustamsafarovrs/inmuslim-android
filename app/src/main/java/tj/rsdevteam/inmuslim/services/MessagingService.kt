@@ -15,6 +15,8 @@ import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Const
 import tj.rsdevteam.inmuslim.data.preferences.Preferences
 import tj.rsdevteam.inmuslim.res.R
@@ -28,11 +30,15 @@ class MessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var preferences: Preferences
 
+    @Inject
+    lateinit var analytics: AnalyticsTracker
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.notification != null &&
             remoteMessage.notification!!.title != null &&
             remoteMessage.notification!!.body != null
         ) {
+            analytics.log(AnalyticsEvent.PushNotificationReceived(remoteMessage.notification?.imageUrl != null))
             sendNotification(
                 remoteMessage.notification!!.title!!,
                 remoteMessage.notification!!.body!!,
@@ -105,6 +111,9 @@ class MessagingService : FirebaseMessagingService() {
         if (this::preferences.isInitialized) {
             if (preferences.getFirebaseToken() != token) {
                 preferences.saveFirebaseToken("")
+                if (this::analytics.isInitialized) {
+                    analytics.log(AnalyticsEvent.PushTokenRefreshed)
+                }
             }
         }
         Log.i(Const.LOGCAT, token)

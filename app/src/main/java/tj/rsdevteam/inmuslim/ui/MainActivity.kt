@@ -3,36 +3,60 @@ package tj.rsdevteam.inmuslim.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Const
 import tj.rsdevteam.inmuslim.core.router.LocalRouter
 import tj.rsdevteam.inmuslim.core.router.Router
 import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.feature.tasbih.ui.calculator.TasbihScreen
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.entryhistory.TasbihEntryHistoryScreen
 import tj.rsdevteam.inmuslim.feature.tasbih.ui.history.TasbihHistoryScreen
 import tj.rsdevteam.inmuslim.feature.tasbih.ui.list.TasbihListScreen
+import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.ui.home.HomeScreen
 import tj.rsdevteam.inmuslim.ui.region.RegionScreen
 import tj.rsdevteam.inmuslim.ui.settings.SettingsScreen
+import tj.rsdevteam.inmuslim.utils.InAppUpdateManager
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var analytics: AnalyticsTracker
+
+    private lateinit var inAppUpdateManager: InAppUpdateManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val startDestination = getStartDestination()
+
+        inAppUpdateManager = InAppUpdateManager(this, analytics)
+        if (savedInstanceState == null) {
+            inAppUpdateManager.checkForUpdate()
+        }
 
         setContent {
             InmuslimTheme {
@@ -44,12 +68,58 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        Navigation(startDestination)
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Navigation(startDestination)
+                            TrackScreenViews(analytics)
+                            UpdateDownloadedSnackbar(
+                                isUpdateDownloaded = inAppUpdateManager.isUpdateDownloaded,
+                                completeUpdate = { inAppUpdateManager.completeUpdate() },
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .navigationBarsPadding(),
+                            )
+                        }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun TrackScreenViews(analytics: AnalyticsTracker) {
+    val router = LocalRouter.current
+    LaunchedEffect(key1 = router) {
+        router.controller.currentBackStackEntryFlow.collect { entry ->
+            entry.destination.toAnalyticsScreen()?.let { analytics.logScreenView(it) }
+        }
+    }
+}
+
+@Composable
+private fun UpdateDownloadedSnackbar(
+    isUpdateDownloaded: Boolean,
+    completeUpdate: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val message = stringResource(id = R.string.base_description_update_downloaded)
+    val actionLabel = stringResource(id = R.string.base_action_update_install)
+
+    LaunchedEffect(key1 = isUpdateDownloaded) {
+        if (isUpdateDownloaded) {
+            val result = snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionLabel,
+                duration = SnackbarDuration.Indefinite,
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                completeUpdate()
+            }
+        }
+    }
+
+    SnackbarHost(hostState = snackbarHostState, modifier = modifier)
 }
 
 @Composable
@@ -61,6 +131,7 @@ fun Navigation(startDestination: Screen) {
         composable<Screen.Settings> { SettingsScreen() }
         composable<Screen.TasbihList> { TasbihListScreen() }
         composable<Screen.TasbihCalculator> { TasbihScreen() }
+        composable<Screen.TasbihEntryHistory> { TasbihEntryHistoryScreen() }
         composable<Screen.TasbihHistory> { TasbihHistoryScreen() }
     }
 }

@@ -9,6 +9,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.repositories.TimingRepository
 import tj.rsdevteam.inmuslim.data.repositories.UserRepository
@@ -26,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel
 @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val timingRepository: TimingRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {
@@ -46,7 +49,6 @@ class HomeViewModel
     }
 
     override fun onCleared() {
-        super.onCleared()
         prayerEndJob?.cancel()
     }
 
@@ -62,6 +64,7 @@ class HomeViewModel
                     }
 
                     is Resource.Error -> {
+                        analytics.log(AnalyticsEvent.TimingLoadFailed(rs.error?.message))
                         state = state.copy(
                             errorBottomSheetConfig = ErrorBottomSheetConfig(
                                 msg = rs.error?.message,
@@ -81,8 +84,13 @@ class HomeViewModel
                 .collect { rs ->
                     when (rs) {
                         is Resource.InProgress -> Unit
-                        is Resource.Success -> updateMessagingId()
-                        is Resource.Error -> Unit
+                        is Resource.Success -> {
+                            analytics.setUserId(userRepository.getUserId().toString())
+                            analytics.log(AnalyticsEvent.UserRegistered)
+                            updateMessagingId()
+                        }
+
+                        is Resource.Error -> analytics.log(AnalyticsEvent.UserRegisterFailed(rs.error?.message))
                     }
                 }
         }
@@ -94,8 +102,8 @@ class HomeViewModel
                 .collect { rs ->
                     when (rs) {
                         is Resource.InProgress -> Unit
-                        is Resource.Success -> Unit
-                        is Resource.Error -> Unit
+                        is Resource.Success -> analytics.log(AnalyticsEvent.MessagingIdUpdated)
+                        is Resource.Error -> analytics.log(AnalyticsEvent.MessagingIdUpdateFailed(rs.error?.message))
                     }
                 }
         }
@@ -117,6 +125,7 @@ class HomeViewModel
     }
 
     fun reviewShowed() {
+        analytics.log(AnalyticsEvent.InAppReviewRequested)
         userRepository.saveReviewShown()
         state = state.copy(isReviewShown = true)
     }

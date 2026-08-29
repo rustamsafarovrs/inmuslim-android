@@ -13,6 +13,8 @@
     <string name="base_action_change_region">Изменить регион</string>
     <string name="base_description_change_region">Сменить регион в другой</string>
     <string name="base_description_timing_source">Время молитв взято с сайта shuroiulamo.tj</string>
+    <string name="base_description_update_downloaded">Обновление приложения загружено</string>
+    <string name="base_action_update_install">Установить</string>
 
     <!-- Common -->
     <string name="common_common_error_title">Ошибка</string>
@@ -22,6 +24,8 @@
     <string name="common_action_add">Добавить</string>
     <string name="common_action_change_language">Изменить язык</string>
     <string name="common_description_change_language">Выбрать язык приложения</string>
+    <string name="common_other_today">Сегодня</string>
+    <string name="common_other_yesterday">Вчера</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Тасбих</string>
@@ -38,4 +42,9 @@
     <string name="tasbih_other_empty">Тасбих не добавлен</string>
     <string name="tasbih_other_add_first">Добавьте первый тасбих</string>
     <string name="tasbih_other_no_history">История отсутствует</string>
+    <string name="tasbih_title_all_history">Вся история</string>
+    <string name="tasbih_other_total">Всего</string>
+    <string name="tasbih_other_days">Дней</string>
+    <string name="tasbih_other_best">Лучший</string>
+    <string name="tasbih_description_no_history">Здесь появятся подсчитанные вами тасбихи</string>
 </resources>

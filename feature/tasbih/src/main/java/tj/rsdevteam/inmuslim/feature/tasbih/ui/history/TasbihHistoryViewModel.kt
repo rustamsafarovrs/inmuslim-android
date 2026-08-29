@@ -3,45 +3,44 @@ package tj.rsdevteam.inmuslim.feature.tasbih.ui.history
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
+import tj.rsdevteam.inmuslim.core.BaseState
 import tj.rsdevteam.inmuslim.core.Resource
-import tj.rsdevteam.inmuslim.core.router.Screen
-import tj.rsdevteam.inmuslim.feature.tasbih.data.repositories.TasbihRepository
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.ObserveHistoryUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class TasbihHistoryViewModel @Inject constructor(
-    private val repository: TasbihRepository,
-    savedStateHandle: SavedStateHandle,
+    private val analytics: AnalyticsTracker,
+    private val observeHistoryUseCase: ObserveHistoryUseCase,
 ) : ViewModel() {
 
-    private val tasbihId = savedStateHandle.toRoute<Screen.TasbihHistory>().tasbihId
-
-    var state by mutableStateOf(TasbihHistoryScreenState())
+    var state by mutableStateOf(TasbihHistoryScreenState(base = BaseState(isLoading = true)))
         private set
 
     init {
-        loadName()
+        analytics.log(AnalyticsEvent.TasbihHistoryOpened)
         observeHistory()
     }
 
-    private fun loadName() {
-        viewModelScope.launch {
-            repository.getTasbihName(tasbihId).collect { rs ->
-                if (rs is Resource.Success) state = state.copy(tasbihName = rs.data)
-            }
-        }
-    }
+    private fun observeHistory() = viewModelScope.launch {
+        observeHistoryUseCase().collect { rs ->
+            state = when (rs) {
+                is Resource.InProgress -> state.copy(base = state.base.copy(isLoading = true))
 
-    private fun observeHistory() {
-        viewModelScope.launch {
-            repository.observeHistory(tasbihId).collect { rs ->
-                if (rs is Resource.Success) state = state.copy(records = rs.data)
+                is Resource.Success -> state.copy(
+                    days = rs.data,
+                    base = state.base.copy(isLoading = false, error = null),
+                )
+
+                is Resource.Error -> state.copy(
+                    base = state.base.copy(isLoading = false, error = rs.error),
+                )
             }
         }
     }

@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":analytics"))
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":res"))

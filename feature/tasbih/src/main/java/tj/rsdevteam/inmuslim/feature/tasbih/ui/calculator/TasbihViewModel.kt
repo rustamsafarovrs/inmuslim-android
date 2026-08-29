@@ -9,35 +9,45 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.core.router.Screen
-import tj.rsdevteam.inmuslim.feature.tasbih.data.repositories.TasbihRepository
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.GetTasbihUseCase
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.IncrementTasbihUseCase
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.IsHapticEnabledUseCase
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.ResetTasbihUseCase
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.SetHapticEnabledUseCase
 import javax.inject.Inject
 
+@Suppress("LongParameterList")
 @HiltViewModel
 class TasbihViewModel @Inject constructor(
-    private val repository: TasbihRepository,
+    private val analytics: AnalyticsTracker,
+    private val getTasbihUseCase: GetTasbihUseCase,
+    private val incrementTasbihUseCase: IncrementTasbihUseCase,
+    private val resetTasbihUseCase: ResetTasbihUseCase,
+    private val setHapticEnabledUseCase: SetHapticEnabledUseCase,
+    isHapticEnabledUseCase: IsHapticEnabledUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val tasbihId = savedStateHandle.toRoute<Screen.TasbihCalculator>().tasbihId
 
-    var state by mutableStateOf(TasbihScreenState(hapticEnabled = repository.isHapticEnabled()))
+    var state by mutableStateOf(TasbihScreenState(hapticEnabled = isHapticEnabledUseCase()))
         private set
 
     init {
-        loadData()
+        analytics.log(AnalyticsEvent.TasbihOpened(tasbihId))
+        loadTasbih()
     }
 
-    private fun loadData() {
+    private fun loadTasbih() {
         viewModelScope.launch {
-            repository.getTasbihName(tasbihId).collect { rs ->
-                if (rs is Resource.Success) state = state.copy(name = rs.data)
-            }
-        }
-        viewModelScope.launch {
-            repository.getTodayCount(tasbihId).collect { rs ->
-                if (rs is Resource.Success) state = state.copy(count = rs.data)
+            getTasbihUseCase(tasbihId).collect { rs ->
+                if (rs is Resource.Success) {
+                    state = state.copy(name = rs.data.name, count = rs.data.todayCount)
+                }
             }
         }
     }
@@ -54,17 +64,23 @@ class TasbihViewModel @Inject constructor(
 
     private fun handleToggleHaptic() {
         val enabled = !state.hapticEnabled
-        repository.setHapticEnabled(enabled)
+        setHapticEnabledUseCase(enabled)
         state = state.copy(hapticEnabled = enabled)
+        analytics.log(AnalyticsEvent.TasbihHapticToggled(enabled))
     }
 
     private fun handleTap() {
-        state = state.copy(count = state.count + 1)
-        viewModelScope.launch { repository.increment(tasbihId).collect {} }
+        val count = state.count + 1
+        state = state.copy(count = count)
+        if (count % 33 == 0) {
+            analytics.log(AnalyticsEvent.TasbihMilestoneReached(tasbihId = tasbihId, count = count))
+        }
+        viewModelScope.launch { incrementTasbihUseCase(tasbihId).collect {} }
     }
 
     private fun handleReset() {
+        analytics.log(AnalyticsEvent.TasbihReset(tasbihId = tasbihId, count = state.count))
         state = state.copy(count = 0, showResetConfirm = false)
-        viewModelScope.launch { repository.reset(tasbihId).collect {} }
+        viewModelScope.launch { resetTasbihUseCase(tasbihId).collect {} }
     }
 }

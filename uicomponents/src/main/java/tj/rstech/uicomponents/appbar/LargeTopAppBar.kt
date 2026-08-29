@@ -1,5 +1,6 @@
 package tj.rstech.uicomponents.appbar
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +20,7 @@ fun LargeTopAppBar(
     title: String,
     scrollBehavior: TopAppBarScrollBehavior,
     didClickBack: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     LargeTopAppBar(
         title = {
@@ -36,6 +38,7 @@ fun LargeTopAppBar(
                 )
             }
         },
+        actions = actions,
         scrollBehavior = scrollBehavior,
     )
 }
