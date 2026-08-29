@@ -20,6 +20,7 @@ import tj.rsdevteam.inmuslim.core.router.Router
 import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.feature.tasbih.ui.calculator.TasbihScreen
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.entryhistory.TasbihEntryHistoryScreen
 import tj.rsdevteam.inmuslim.feature.tasbih.ui.history.TasbihHistoryScreen
 import tj.rsdevteam.inmuslim.feature.tasbih.ui.list.TasbihListScreen
 import tj.rsdevteam.inmuslim.ui.home.HomeScreen
@@ -61,6 +62,7 @@ fun Navigation(startDestination: Screen) {
         composable<Screen.Settings> { SettingsScreen() }
         composable<Screen.TasbihList> { TasbihListScreen() }
         composable<Screen.TasbihCalculator> { TasbihScreen() }
+        composable<Screen.TasbihEntryHistory> { TasbihEntryHistoryScreen() }
         composable<Screen.TasbihHistory> { TasbihHistoryScreen() }
     }
 }

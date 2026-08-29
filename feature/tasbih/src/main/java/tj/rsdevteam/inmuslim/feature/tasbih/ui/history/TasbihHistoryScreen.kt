@@ -1,8 +1,8 @@
 package tj.rsdevteam.inmuslim.feature.tasbih.ui.history
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,32 +10,45 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import tj.rsdevteam.inmuslim.core.TitleValue
+import tj.rsdevteam.inmuslim.core.asTextRes
+import tj.rsdevteam.inmuslim.core.resolve
 import tj.rsdevteam.inmuslim.core.router.LocalRouter
+import tj.rsdevteam.inmuslim.core.router.Screen
+import tj.rsdevteam.inmuslim.core.router.theme.InmuslimShapes
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
-import tj.rsdevteam.inmuslim.core.utils.DateUtils
-import tj.rsdevteam.inmuslim.feature.tasbih.data.models.TasbihRecord
+import tj.rsdevteam.inmuslim.core.utils.NumberFormatter
+import tj.rsdevteam.inmuslim.feature.tasbih.data.models.TasbihDayHistory
+import tj.rsdevteam.inmuslim.feature.tasbih.data.models.TasbihHistoryEntry
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.common.CountBadge
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.common.HistoryEmptyState
+import tj.rsdevteam.inmuslim.feature.tasbih.ui.common.HistorySummaryCard
 import tj.rsdevteam.inmuslim.res.R
+import tj.rstech.uicomponents.ProgressIndicator
+import tj.rstech.uicomponents.appbar.LargeTopAppBar
 
 @Composable
 fun TasbihHistoryScreen() {
@@ -44,6 +57,7 @@ fun TasbihHistoryScreen() {
     TasbihHistoryScreen(
         state = viewModel.state,
         didClickBack = { router.navigateUp() },
+        didSelectEntry = { router.navigate(Screen.TasbihEntryHistory(it.tasbihId)) },
     )
 }
 
@@ -52,109 +66,120 @@ fun TasbihHistoryScreen() {
 private fun TasbihHistoryScreen(
     state: TasbihHistoryScreenState,
     didClickBack: () -> Unit = {},
+    didSelectEntry: (TasbihHistoryEntry) -> Unit = {},
 ) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.tasbih_title_history),
-                            style = InmuslimTypo.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-                        )
-                        if (state.tasbihName.isNotEmpty()) {
-                            Text(
-                                text = state.tasbihName,
-                                style = InmuslimTypo.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = didClickBack) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back_24),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                ),
-            )
+            LargeTopAppBar(stringResource(R.string.tasbih_title_all_history), scrollBehavior, didClickBack)
         },
         containerColor = MaterialTheme.colorScheme.background,
-    ) { padding ->
-        if (state.records.isEmpty()) {
-            HistoryEmptyState(modifier = Modifier.padding(padding))
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-            ) {
-                items(state.records) { record ->
-                    HistoryItem(record = record)
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+    ) { safeArea ->
+        val contentModifier = Modifier.padding(safeArea)
+        when {
+            state.days.isNotEmpty() -> LazyColumn(modifier = contentModifier.fillMaxSize()) {
+                item {
+                    HistorySummaryCard(
+                        stats = summaryStats(state),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                     )
                 }
-                item { Spacer(modifier = Modifier.height(32.dp)) }
+                days(days = state.days, didSelectEntry = didSelectEntry)
+                item { Spacer(modifier = Modifier.height(24.dp)) }
             }
+
+            state.base.isLoading -> Box(modifier = contentModifier) { ProgressIndicator() }
+
+            else -> HistoryEmptyState(
+                title = stringResource(R.string.tasbih_other_no_history),
+                description = stringResource(R.string.tasbih_description_no_history),
+                modifier = contentModifier,
+            )
+        }
+    }
+}
+
+private fun LazyListScope.days(
+    days: List<TasbihDayHistory>,
+    didSelectEntry: (TasbihHistoryEntry) -> Unit,
+) {
+    days.forEach { day ->
+        stickyHeader(key = day.date) { DayHeader(day = day) }
+        items(items = day.entries, key = { "${day.date}_${it.tasbihId}" }) { entry ->
+            EntryItem(
+                entry = entry,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                didClick = { didSelectEntry(entry) },
+            )
         }
     }
 }
 
 @Composable
-private fun HistoryItem(record: TasbihRecord) {
+private fun summaryStats(state: TasbihHistoryScreenState): List<TitleValue> = listOf(
+    TitleValue(title = stringResource(R.string.tasbih_other_total), value = NumberFormatter.format(state.totalCount)),
+    TitleValue(title = stringResource(R.string.tasbih_other_days), value = NumberFormatter.format(state.activeDays)),
+    TitleValue(title = stringResource(R.string.tasbih_title_tasbih), value = NumberFormatter.format(state.tasbihCount)),
+)
+
+@Composable
+private fun DayHeader(day: TasbihDayHistory) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 16.dp)
+            .padding(top = 16.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = DateUtils.formatDateTime(
-                    record.date,
-                    resultPattern = DateUtils.HUMAN_DATE,
-                    dateTimePattern = DateUtils.ISO_DATE,
-                ) ?: "",
-                style = InmuslimTypo.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
         Text(
-            text = record.count.toString(),
-            style = InmuslimTypo.titleMedium.copy(fontWeight = FontWeight.Bold),
+            text = day.dateLabel.resolve(),
+            modifier = Modifier.weight(1f),
+            style = InmuslimTypo.titleSmall.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.primary,
+        )
+        CountBadge(
+            count = day.total,
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+            contentColor = MaterialTheme.colorScheme.primary,
         )
     }
 }
 
 @Composable
-private fun HistoryEmptyState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+private fun EntryItem(
+    entry: TasbihHistoryEntry,
+    modifier: Modifier = Modifier,
+    didClick: () -> Unit = {},
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(InmuslimShapes.large)
+            .clickable { didClick() },
+        shape = InmuslimShapes.large,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                painter = painterResource(R.drawable.ic_history_24),
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
-                text = stringResource(R.string.tasbih_other_no_history),
-                style = InmuslimTypo.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = entry.tasbihName,
+                modifier = Modifier.weight(1f),
+                style = InmuslimTypo.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            CountBadge(count = entry.count)
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(R.drawable.outline_arrow_forward_ios_24),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.size(16.dp),
             )
         }
     }
@@ -167,11 +192,24 @@ private fun TasbihHistoryScreenPreview() {
     InmuslimTheme {
         TasbihHistoryScreen(
             state = TasbihHistoryScreenState(
-                tasbihName = "SubhanAllah",
-                records = listOf(
-                    TasbihRecord(1, 1, 99, "2026-04-27"),
-                    TasbihRecord(2, 1, 33, "2026-04-26"),
-                    TasbihRecord(3, 1, 100, "2026-04-25"),
+                days = listOf(
+                    TasbihDayHistory(
+                        date = "2026-04-27",
+                        dateLabel = "Today".asTextRes(),
+                        total = 132,
+                        entries = listOf(
+                            TasbihHistoryEntry(1, "SubhanAllah", 99, "2026-04-27", "Today".asTextRes()),
+                            TasbihHistoryEntry(2, "Alhamdulillah", 33, "2026-04-27", "Today".asTextRes()),
+                        ),
+                    ),
+                    TasbihDayHistory(
+                        date = "2026-04-25",
+                        dateLabel = "25 April 2026".asTextRes(),
+                        total = 100,
+                        entries = listOf(
+                            TasbihHistoryEntry(3, "Allahu Akbar", 100, "2026-04-25", "25 April 2026".asTextRes()),
+                        ),
+                    ),
                 ),
             ),
         )
@@ -182,8 +220,6 @@ private fun TasbihHistoryScreenPreview() {
 @Composable
 private fun TasbihHistoryEmptyPreview() {
     InmuslimTheme {
-        TasbihHistoryScreen(
-            state = TasbihHistoryScreenState(tasbihName = "SubhanAllah"),
-        )
+        TasbihHistoryScreen(state = TasbihHistoryScreenState())
     }
 }

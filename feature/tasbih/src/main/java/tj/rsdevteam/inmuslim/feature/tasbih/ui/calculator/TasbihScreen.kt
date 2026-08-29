@@ -49,18 +49,19 @@ import tj.rsdevteam.inmuslim.core.router.LocalRouter
 import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTheme
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
+import tj.rsdevteam.inmuslim.core.utils.NumberFormatter
 import tj.rsdevteam.inmuslim.res.R
-import java.text.NumberFormat
 
 @Composable
 fun TasbihScreen() {
     val router = LocalRouter.current
     val viewModel: TasbihViewModel = hiltViewModel()
+    val tasbihId = router.toRoute<Screen.TasbihCalculator>().tasbihId
     TasbihScreen(
         state = viewModel.state,
         handleEvent = viewModel::handleEvent,
         didClickBack = router::navigateUp,
-        didClickHistory = { router.navigate(Screen.TasbihHistory(router.toRoute<Screen.TasbihCalculator>().tasbihId)) },
+        didClickEntryHistory = { router.navigate(Screen.TasbihEntryHistory(tasbihId)) },
     )
 }
 
@@ -70,7 +71,7 @@ private fun TasbihScreen(
     state: TasbihScreenState,
     handleEvent: (TasbihUIEvent) -> Unit,
     didClickBack: () -> Unit,
-    didClickHistory: () -> Unit,
+    didClickEntryHistory: () -> Unit,
 ) {
     val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -81,7 +82,7 @@ private fun TasbihScreen(
                 title = state.name,
                 hapticEnabled = state.hapticEnabled,
                 didClickBack = didClickBack,
-                didClickHistory = didClickHistory,
+                didClickEntryHistory = didClickEntryHistory,
                 didClickReset = { handleEvent(TasbihUIEvent.DidClickReset) },
                 didToggleHaptic = { handleEvent(TasbihUIEvent.DidToggleHaptic) },
             )
@@ -134,7 +135,7 @@ private fun TasbihTopBar(
     title: String,
     hapticEnabled: Boolean,
     didClickBack: () -> Unit = {},
-    didClickHistory: () -> Unit = {},
+    didClickEntryHistory: () -> Unit = {},
     didClickReset: () -> Unit = {},
     didToggleHaptic: () -> Unit = {},
 ) {
@@ -154,7 +155,7 @@ private fun TasbihTopBar(
                 )
             }
         },
-        actions = { AppBarActions(hapticEnabled, didToggleHaptic, didClickHistory, didClickReset) },
+        actions = { AppBarActions(hapticEnabled, didToggleHaptic, didClickEntryHistory, didClickReset) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
         ),
@@ -165,7 +166,7 @@ private fun TasbihTopBar(
 private fun AppBarActions(
     hapticEnabled: Boolean,
     didToggleHaptic: () -> Unit = {},
-    didClickHistory: () -> Unit = {},
+    didClickEntryHistory: () -> Unit = {},
     didClickReset: () -> Unit = {},
 ) {
     val hapticIcon = if (hapticEnabled) {
@@ -190,7 +191,7 @@ private fun AppBarActions(
             },
         )
     }
-    IconButton(onClick = didClickHistory) {
+    IconButton(onClick = didClickEntryHistory) {
         Icon(
             painter = painterResource(R.drawable.ic_history_24),
             contentDescription = null,
@@ -232,7 +233,7 @@ private fun Count(count: Int, modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = NumberFormat.getNumberInstance().format(count),
+                text = NumberFormatter.format(count),
                 style = InmuslimTypo.headlineLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 60.sp,
@@ -295,7 +296,7 @@ private fun TasbihScreenPreview() {
             state = TasbihScreenState(name = "SubhanAllah", count = 33),
             handleEvent = {},
             didClickBack = {},
-            didClickHistory = {},
+            didClickEntryHistory = {},
         )
     }
 }
@@ -308,7 +309,7 @@ private fun TasbihScreenZeroPreview() {
             state = TasbihScreenState(name = "Alhamdulillah", count = 0),
             handleEvent = {},
             didClickBack = {},
-            didClickHistory = {},
+            didClickEntryHistory = {},
         )
     }
 }

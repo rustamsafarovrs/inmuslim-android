@@ -25,5 +25,8 @@ sealed class Screen {
     data class TasbihCalculator(val tasbihId: Long) : Screen()
 
     @Serializable
-    data class TasbihHistory(val tasbihId: Long) : Screen()
+    data class TasbihEntryHistory(val tasbihId: Long) : Screen()
+
+    @Serializable
+    object TasbihHistory : Screen()
 }

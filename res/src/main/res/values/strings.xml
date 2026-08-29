@@ -24,6 +24,8 @@
     <string name="common_action_add">Иловакунӣ</string>
     <string name="common_action_change_language">Тағйири забон</string>
     <string name="common_description_change_language">Интихоби забони барнома</string>
+    <string name="common_other_today">Имрӯз</string>
+    <string name="common_other_yesterday">Дирӯз</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Тасбеҳ</string>
@@ -40,4 +42,9 @@
     <string name="tasbih_other_empty">Тасбеҳе илова нашудааст</string>
     <string name="tasbih_other_add_first">Тасбеҳи аввалатонро илова кунед</string>
     <string name="tasbih_other_no_history">Таърих мавҷуд нест</string>
+    <string name="tasbih_title_all_history">Таърихи умумӣ</string>
+    <string name="tasbih_other_total">Ҳамагӣ</string>
+    <string name="tasbih_other_days">Рӯзҳо</string>
+    <string name="tasbih_other_best">Беҳтарин</string>
+    <string name="tasbih_description_no_history">Тасбеҳҳои шумурдаатон дар ин ҷо намоён мешаванд</string>
 </resources>

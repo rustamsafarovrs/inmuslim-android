@@ -10,8 +10,16 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TasbihDao {
 
-    @Query("SELECT * FROM tasbihs ORDER BY id DESC")
-    fun observeAll(): Flow<List<TasbihEntity>>
+    @Query(
+        """
+        SELECT t.id AS id, t.name AS name, IFNULL(SUM(r.count), 0) AS todayCount
+        FROM tasbihs t
+        LEFT JOIN tasbih_records r ON r.tasbihId = t.id AND r.date = :date
+        GROUP BY t.id
+        ORDER BY t.id DESC
+        """,
+    )
+    fun observeAllWithCountFor(date: String): Flow<List<TasbihWithTodayCountEntity>>
 
     @Insert
     suspend fun insert(entity: TasbihEntity): Long
@@ -28,6 +36,17 @@ interface TasbihDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertRecord(record: TasbihRecordEntity)
 
-    @Query("SELECT * FROM tasbih_records WHERE tasbihId = :tasbihId ORDER BY date DESC")
-    fun observeHistory(tasbihId: Long): Flow<List<TasbihRecordEntity>>
+    @Query("SELECT * FROM tasbih_records WHERE tasbihId = :tasbihId AND count > 0 ORDER BY date DESC")
+    fun observeEntryHistory(tasbihId: Long): Flow<List<TasbihRecordEntity>>
+
+    @Query(
+        """
+        SELECT r.tasbihId AS tasbihId, t.name AS tasbihName, r.count AS count, r.date AS date
+        FROM tasbih_records r
+        INNER JOIN tasbihs t ON t.id = r.tasbihId
+        WHERE r.count > 0
+        ORDER BY r.date DESC, r.count DESC
+        """,
+    )
+    fun observeHistory(): Flow<List<TasbihRecordWithNameEntity>>
 }

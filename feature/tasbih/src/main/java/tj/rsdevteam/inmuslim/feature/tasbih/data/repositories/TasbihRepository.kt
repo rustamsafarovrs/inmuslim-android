@@ -3,13 +3,16 @@ package tj.rsdevteam.inmuslim.feature.tasbih.data.repositories
 import kotlinx.coroutines.flow.Flow
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.feature.tasbih.data.models.Tasbih
+import tj.rsdevteam.inmuslim.feature.tasbih.data.models.TasbihDayHistory
 import tj.rsdevteam.inmuslim.feature.tasbih.data.models.TasbihRecord
 
 interface TasbihRepository {
 
     fun observeTasbihs(): Flow<Resource<List<Tasbih>>>
 
-    fun observeHistory(tasbihId: Long): Flow<Resource<List<TasbihRecord>>>
+    fun observeEntryHistory(tasbihId: Long): Flow<Resource<List<TasbihRecord>>>
+
+    fun observeHistory(): Flow<Resource<List<TasbihDayHistory>>>
 
     fun addTasbih(name: String): Flow<Resource<Long>>
 

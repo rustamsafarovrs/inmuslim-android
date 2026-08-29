@@ -8,12 +8,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.core.Resource
-import tj.rsdevteam.inmuslim.feature.tasbih.data.repositories.TasbihRepository
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.AddTasbihUseCase
+import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.ObserveTasbihsUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class TasbihListViewModel @Inject constructor(
-    private val repository: TasbihRepository,
+    private val observeTasbihsUseCase: ObserveTasbihsUseCase,
+    private val addTasbihUseCase: AddTasbihUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(TasbihListScreenState())
@@ -25,7 +27,7 @@ class TasbihListViewModel @Inject constructor(
 
     private fun observeTasbihs() {
         viewModelScope.launch {
-            repository.observeTasbihs().collect { rs ->
+            observeTasbihsUseCase().collect { rs ->
                 state = when (rs) {
                     is Resource.InProgress -> state.copy(base = state.base.copy(isLoading = true))
                     is Resource.Success -> state.copy(
@@ -51,7 +53,7 @@ class TasbihListViewModel @Inject constructor(
     private fun addTasbih(name: String) {
         state = state.copy(showAddDialog = false)
         viewModelScope.launch {
-            repository.addTasbih(name).collect { rs ->
+            addTasbihUseCase(name).collect { rs ->
                 if (rs is Resource.Error) {
                     state = state.copy(base = state.base.copy(error = rs.error))
                 }
