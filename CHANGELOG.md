@@ -1,4 +1,4 @@
-# WinGo Changelog
+# Inmuslim Changelog
 
 ## 1.4.0
 
