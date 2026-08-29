@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.core.router.Screen
 import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.GetTasbihUseCase
@@ -18,8 +20,10 @@ import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.ResetTasbihUseCase
 import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.SetHapticEnabledUseCase
 import javax.inject.Inject
 
+@Suppress("LongParameterList")
 @HiltViewModel
 class TasbihViewModel @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val getTasbihUseCase: GetTasbihUseCase,
     private val incrementTasbihUseCase: IncrementTasbihUseCase,
     private val resetTasbihUseCase: ResetTasbihUseCase,
@@ -34,6 +38,7 @@ class TasbihViewModel @Inject constructor(
         private set
 
     init {
+        analytics.log(AnalyticsEvent.TasbihOpened(tasbihId))
         loadTasbih()
     }
 
@@ -61,14 +66,20 @@ class TasbihViewModel @Inject constructor(
         val enabled = !state.hapticEnabled
         setHapticEnabledUseCase(enabled)
         state = state.copy(hapticEnabled = enabled)
+        analytics.log(AnalyticsEvent.TasbihHapticToggled(enabled))
     }
 
     private fun handleTap() {
-        state = state.copy(count = state.count + 1)
+        val count = state.count + 1
+        state = state.copy(count = count)
+        if (count % 33 == 0) {
+            analytics.log(AnalyticsEvent.TasbihMilestoneReached(tasbihId = tasbihId, count = count))
+        }
         viewModelScope.launch { incrementTasbihUseCase(tasbihId).collect {} }
     }
 
     private fun handleReset() {
+        analytics.log(AnalyticsEvent.TasbihReset(tasbihId = tasbihId, count = state.count))
         state = state.copy(count = 0, showResetConfirm = false)
         viewModelScope.launch { resetTasbihUseCase(tasbihId).collect {} }
     }

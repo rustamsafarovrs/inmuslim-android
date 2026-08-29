@@ -126,6 +126,7 @@ dependencies {
 
     implementation(libs.google.play.review.ktx)
     implementation(libs.google.play.app.update.ktx)
+    implementation(project(":analytics"))
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":res"))

@@ -6,7 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsProperty
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.data.repositories.RegionRepository
+import tj.rsdevteam.inmuslim.data.repositories.UserRepository
 import javax.inject.Inject
 
 /**
@@ -17,7 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class LaunchViewModel
 @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val regionRepository: RegionRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val _event = Channel<LaunchVMEvent>()
@@ -37,11 +43,29 @@ class LaunchViewModel
 
     private fun checkRegion() {
         viewModelScope.launch {
-            if (regionRepository.getRegionId() > 0) {
-                _event.send(LaunchVMEvent.OpenMain(false))
-            } else {
-                _event.send(LaunchVMEvent.OpenMain(true))
-            }
+            val regionId = regionRepository.getRegionId()
+            identify(regionId)
+            val openOnboarding = regionId <= 0
+            analytics.log(AnalyticsEvent.AppLaunched(openOnboarding))
+            _event.send(LaunchVMEvent.OpenMain(openOnboarding))
         }
+    }
+
+    /**
+     * Re-attaches who this install is to every event of the session. Firebase keeps both values
+     * itself, but a cold start is the one place that knows them even when nothing else changed.
+     */
+    private fun identify(regionId: Long) {
+        analytics.setUserId(userRepository.getUserId().orNullIfUnset())
+        analytics.setUserProperty(AnalyticsProperty.REGION_ID, regionId.orNullIfUnset())
+    }
+
+    /** Nothing is registered yet on a first run, and analytics expects `null` rather than `"-1"`. */
+    private fun Long.orNullIfUnset(): String? = takeIf { it != UNSET_ID }?.toString()
+
+    private companion object {
+
+        /** The "unset" sentinel both stored ids use. */
+        const val UNSET_ID = -1L
     }
 }

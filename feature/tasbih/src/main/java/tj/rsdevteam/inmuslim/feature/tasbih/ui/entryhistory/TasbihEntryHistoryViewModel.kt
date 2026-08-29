@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.BaseState
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.core.router.Screen
@@ -18,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TasbihEntryHistoryViewModel @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val observeEntryHistoryUseCase: ObserveEntryHistoryUseCase,
     private val getTasbihNameUseCase: GetTasbihNameUseCase,
     savedStateHandle: SavedStateHandle,
@@ -29,6 +32,7 @@ class TasbihEntryHistoryViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
+        analytics.log(AnalyticsEvent.TasbihEntryHistoryOpened(tasbihId))
         loadName()
         observeEntryHistory()
     }

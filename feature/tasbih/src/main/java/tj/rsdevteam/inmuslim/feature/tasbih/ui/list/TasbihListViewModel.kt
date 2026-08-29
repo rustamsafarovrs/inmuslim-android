@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.AddTasbihUseCase
 import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.ObserveTasbihsUseCase
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TasbihListViewModel @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val observeTasbihsUseCase: ObserveTasbihsUseCase,
     private val addTasbihUseCase: AddTasbihUseCase,
 ) : ViewModel() {
@@ -44,7 +47,11 @@ class TasbihListViewModel @Inject constructor(
 
     fun handleEvent(event: TasbihListUIEvent) {
         when (event) {
-            is TasbihListUIEvent.DidClickShowAddDialog -> state = state.copy(showAddDialog = true)
+            is TasbihListUIEvent.DidClickShowAddDialog -> {
+                analytics.log(AnalyticsEvent.TasbihAddDialogShown)
+                state = state.copy(showAddDialog = true)
+            }
+
             is TasbihListUIEvent.DidDismissAddDialog -> state = state.copy(showAddDialog = false)
             is TasbihListUIEvent.DidClickAdd -> addTasbih(event.name)
         }
@@ -54,8 +61,10 @@ class TasbihListViewModel @Inject constructor(
         state = state.copy(showAddDialog = false)
         viewModelScope.launch {
             addTasbihUseCase(name).collect { rs ->
-                if (rs is Resource.Error) {
-                    state = state.copy(base = state.base.copy(error = rs.error))
+                when (rs) {
+                    is Resource.InProgress -> Unit
+                    is Resource.Success -> analytics.log(AnalyticsEvent.TasbihAdded(name.length))
+                    is Resource.Error -> state = state.copy(base = state.base.copy(error = rs.error))
                 }
             }
         }

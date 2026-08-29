@@ -18,6 +18,8 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Const
 
 /**
@@ -28,20 +30,31 @@ import tj.rsdevteam.inmuslim.core.Const
  * are installed with the immediate flow, everything else is downloaded in the background with the
  * flexible flow and installed once the user confirms.
  */
-class InAppUpdateManager(activity: ComponentActivity) : DefaultLifecycleObserver {
+class InAppUpdateManager(
+    activity: ComponentActivity,
+    private val analytics: AnalyticsTracker,
+) : DefaultLifecycleObserver {
 
     private val appUpdateManager = AppUpdateManagerFactory.create(activity)
 
     private val updateLauncher: ActivityResultLauncher<IntentSenderRequest> =
         activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode != Activity.RESULT_OK) {
+                analytics.log(AnalyticsEvent.InAppUpdateCancelled(result.resultCode))
                 Log.i(Const.LOGCAT, "In-app update flow finished with resultCode=${result.resultCode}")
             }
         }
 
     private val installListener = InstallStateUpdatedListener { state ->
-        if (state.installStatus() == InstallStatus.DOWNLOADED) {
-            isUpdateDownloaded = true
+        when (state.installStatus()) {
+            InstallStatus.DOWNLOADED -> {
+                analytics.log(AnalyticsEvent.InAppUpdateDownloaded)
+                isUpdateDownloaded = true
+            }
+
+            InstallStatus.FAILED -> analytics.log(AnalyticsEvent.InAppUpdateFailed("code=${state.installErrorCode()}"))
+
+            else -> Unit
         }
     }
 
@@ -80,8 +93,11 @@ class InAppUpdateManager(activity: ComponentActivity) : DefaultLifecycleObserver
             when {
                 info.installStatus() == InstallStatus.DOWNLOADED -> isUpdateDownloaded = true
 
-                info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ->
-                    startUpdate(info, updateTypeFor(info))
+                info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE -> {
+                    val type = updateTypeFor(info)
+                    analytics.log(AnalyticsEvent.InAppUpdateAvailable(analyticsNameOf(type)))
+                    startUpdate(info, type)
+                }
 
                 else -> Unit
             }
@@ -90,18 +106,26 @@ class InAppUpdateManager(activity: ComponentActivity) : DefaultLifecycleObserver
 
     /** Restarts the app to install an already downloaded flexible update. */
     fun completeUpdate() {
+        analytics.log(AnalyticsEvent.InAppUpdateCompleted)
         appUpdateManager.completeUpdate()
     }
 
     private fun requestUpdateInfo(onInfo: (AppUpdateInfo) -> Unit) {
         appUpdateManager.appUpdateInfo
             .addOnSuccessListener { info -> onInfo(info) }
+            // Not an error worth an event: off the Play Store this is simply the normal answer,
+            // and onResume asks again on every foreground.
             .addOnFailureListener { e -> Log.i(Const.LOGCAT, "In-app update is not available: ${e.message}") }
     }
 
     private fun startUpdate(info: AppUpdateInfo, @AppUpdateType type: Int) {
         if (!info.isUpdateTypeAllowed(type)) return
+        analytics.log(AnalyticsEvent.InAppUpdateStarted(analyticsNameOf(type)))
         appUpdateManager.startUpdateFlowForResult(info, updateLauncher, AppUpdateOptions.newBuilder(type).build())
+    }
+
+    private fun analyticsNameOf(@AppUpdateType type: Int): String {
+        return if (type == AppUpdateType.IMMEDIATE) IMMEDIATE_NAME else FLEXIBLE_NAME
     }
 
     @AppUpdateType
@@ -122,5 +146,8 @@ class InAppUpdateManager(activity: ComponentActivity) : DefaultLifecycleObserver
 
         /** Days the update may stay uninstalled before it is forced. */
         const val IMMEDIATE_UPDATE_STALE_DAYS = 14
+
+        const val IMMEDIATE_NAME = "immediate"
+        const val FLEXIBLE_NAME = "flexible"
     }
 }

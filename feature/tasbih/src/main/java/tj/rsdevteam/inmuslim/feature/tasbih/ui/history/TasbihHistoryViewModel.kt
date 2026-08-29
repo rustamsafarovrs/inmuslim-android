@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.BaseState
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.feature.tasbih.domain.usecases.ObserveHistoryUseCase
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TasbihHistoryViewModel @Inject constructor(
+    private val analytics: AnalyticsTracker,
     private val observeHistoryUseCase: ObserveHistoryUseCase,
 ) : ViewModel() {
 
@@ -21,6 +24,7 @@ class TasbihHistoryViewModel @Inject constructor(
         private set
 
     init {
+        analytics.log(AnalyticsEvent.TasbihHistoryOpened)
         observeHistory()
     }
 

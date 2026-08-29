@@ -49,13 +49,15 @@ Debug builds are *not* release-shrunk; release enables minify + resource shrinki
 :core            Router/Screen, Resource, BaseState, TextRes, TitleValue, theme,
                  DateUtils/NumberFormatter, BuildVars (owns BASE_URL BuildConfig field)
 :data            SharedPreferences wrapper (`Preferences`) + DataModule only
+:analytics       AnalyticsTracker/AnalyticsEvent/AnalyticsScreen + FirebaseAnalyticsTracker;
+                 `explicitApi()` is on, so every public declaration needs an explicit modifier
 :res             ALL string/drawable/font resources — R class is `tj.rsdevteam.inmuslim.res.R`
 :uicomponents    shared Compose widgets (namespace `tj.rstech.uicomponents`): Button,
                  ProgressIndicator, LargeTopAppBar, ErrorBottomSheet(+Config)
 :feature:tasbih  self-contained feature: Room DB, repository, use cases, 4 screens
 ```
 
-Dependency direction: `app` → everything; `feature:tasbih` → `core`, `data`, `res`, `uicomponents`; `uicomponents` → `core`, `res`; `core` → `res`.
+Dependency direction: `app` → everything; `feature:tasbih` → `analytics`, `core`, `data`, `res`, `uicomponents`; `uicomponents` → `core`, `res`; `core` → `res`; `analytics` → nothing in the project.
 
 **Gotcha:** the `:data` module holds *only* `Preferences` and its Hilt module. The Retrofit `Api`, DTOs, mappers and network repositories still live under `app/src/main/java/.../data/`. Don't assume network code is in `:data`.
 
@@ -128,6 +130,20 @@ POST /messaging/update-messaging-id
 ```
 
 `UserRepository.needRegister()` returns false in TEST builds — device registration is deliberately disabled for debug.
+
+### Analytics
+
+`AnalyticsTracker` (`:analytics`) is the only way anything is reported, and `AnalyticsEvent` is a
+sealed catalogue of every event — adding a case there is how you add an event, so the taxonomy stays
+in one reviewable file. Inject `AnalyticsTracker` into the ViewModel and log from `handleEvent` or
+`init`; screen views are *not* logged per screen, `MainActivity.TrackScreenViews` reports them
+centrally off the nav back stack, so a new screen needs a new `AnalyticsScreen` entry and a branch in
+`NavDestination.toAnalyticsScreen()`. `FirebaseAnalyticsTracker` is the only class touching the
+Firebase SDK. Event names must be snake_case, ≤ 40 chars and never prefixed `firebase_`/`google_`/`ga_`.
+
+Identity is separate from events: `setUserId` and `setUserProperty(AnalyticsProperty.REGION_ID, …)`
+are re-applied by `LaunchViewModel.identify()` on every cold start, and pushed again the moment they
+change (`HomeViewModel` after a successful registration, `RegionViewModel` on a confirmed region).
 
 ### Tasbih feature
 

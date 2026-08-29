@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Const
 import tj.rsdevteam.inmuslim.core.router.LocalRouter
 import tj.rsdevteam.inmuslim.core.router.Router
@@ -37,9 +38,13 @@ import tj.rsdevteam.inmuslim.ui.home.HomeScreen
 import tj.rsdevteam.inmuslim.ui.region.RegionScreen
 import tj.rsdevteam.inmuslim.ui.settings.SettingsScreen
 import tj.rsdevteam.inmuslim.utils.InAppUpdateManager
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var analytics: AnalyticsTracker
 
     private lateinit var inAppUpdateManager: InAppUpdateManager
 
@@ -48,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
         val startDestination = getStartDestination()
 
-        inAppUpdateManager = InAppUpdateManager(this)
+        inAppUpdateManager = InAppUpdateManager(this, analytics)
         if (savedInstanceState == null) {
             inAppUpdateManager.checkForUpdate()
         }
@@ -65,6 +70,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             Navigation(startDestination)
+                            TrackScreenViews(analytics)
                             UpdateDownloadedSnackbar(
                                 isUpdateDownloaded = inAppUpdateManager.isUpdateDownloaded,
                                 completeUpdate = { inAppUpdateManager.completeUpdate() },
@@ -76,6 +82,16 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TrackScreenViews(analytics: AnalyticsTracker) {
+    val router = LocalRouter.current
+    LaunchedEffect(key1 = router) {
+        router.controller.currentBackStackEntryFlow.collect { entry ->
+            entry.destination.toAnalyticsScreen()?.let { analytics.logScreenView(it) }
         }
     }
 }
