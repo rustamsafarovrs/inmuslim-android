@@ -13,6 +13,8 @@
     <string name="base_action_change_region">Изменить регион</string>
     <string name="base_description_change_region">Сменить регион в другой</string>
     <string name="base_description_timing_source">Время молитв взято с сайта shuroiulamo.tj</string>
+    <string name="base_description_update_downloaded">Обновление приложения загружено</string>
+    <string name="base_action_update_install">Установить</string>
 
     <!-- Common -->
     <string name="common_common_error_title">Ошибка</string>

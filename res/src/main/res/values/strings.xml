@@ -14,6 +14,8 @@
     <string name="base_action_change_region">Тағйир додани минтақа</string>
     <string name="base_description_change_region">Ба минтақаи дигар иваз намудан</string>
     <string name="base_description_timing_source">Вақтҳои намоз аз сомонаи shuroiulamo.tj гирифта шудаанд</string>
+    <string name="base_description_update_downloaded">Навсозии барнома зеркашӣ шуд</string>
+    <string name="base_action_update_install">Насб кардан</string>
 
     <!-- Common -->
     <string name="common_common_push_notifications" translatable="false">Push-notifications</string>

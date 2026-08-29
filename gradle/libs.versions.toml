@@ -21,6 +21,7 @@ retrofitAdapters = "1.1.0"
 moshi = "1.15.2"
 firebaseBom = "34.17.0"
 googlePlayReview = "2.0.2"
+googlePlayAppUpdate = "2.1.0"
 junit = "4.13.2"
 junitAndroid = "1.3.0"
 espresso = "3.7.0"
@@ -84,6 +85,7 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 
 google-play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "googlePlayReview" }
+google-play-app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "googlePlayAppUpdate" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 

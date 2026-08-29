@@ -125,6 +125,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 
     implementation(libs.google.play.review.ktx)
+    implementation(libs.google.play.app.update.ktx)
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":res"))

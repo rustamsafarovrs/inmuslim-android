@@ -13,6 +13,8 @@
     <string name="base_action_change_region">Change region</string>
     <string name="base_description_change_region">Change to another region</string>
     <string name="base_description_timing_source">Prayer timings are taken from shuroiulamo.tj</string>
+    <string name="base_description_update_downloaded">An app update has been downloaded</string>
+    <string name="base_action_update_install">Install</string>
 
     <!-- Common -->
     <string name="common_common_error_title">Error</string>
