@@ -19,8 +19,8 @@ android {
         applicationId = "tj.rsdevteam.inmuslim"
         minSdk = libs.versions.androidMinSdk.get().toInt()
         targetSdk = libs.versions.androidSdk.get().toInt()
-        versionCode = 9
-        versionName = "1.4.0"
+        versionCode = 10
+        versionName = "1.5.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
         manifestPlaceholders["appName"] = "@string/app_name"
