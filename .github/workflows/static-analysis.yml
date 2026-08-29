@@ -1,0 +1,65 @@
+name: static analysis
+on: [ push, pull_request ]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    detekt:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Setup JDK
+                uses: actions/setup-java@v4
+                with:
+                    distribution: oracle
+                    java-version: '21'
+                    cache: gradle
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Run detekt
+                run: ./gradlew detekt
+
+            -   name: Upload detekt reports
+                if: always()
+                uses: actions/upload-artifact@v4
+                with:
+                    name: detekt-reports
+                    path: '**/build/reports/detekt/'
+                    retention-days: 7
+                    if-no-files-found: ignore
+
+    lint:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Setup JDK
+                uses: actions/setup-java@v4
+                with:
+                    distribution: oracle
+                    java-version: '21'
+                    cache: gradle
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Run Android Lint
+                run: ./gradlew lint
+
+            -   name: Upload lint reports
+                if: always()
+                uses: actions/upload-artifact@v4
+                with:
+                    name: lint-reports
+                    path: '**/build/reports/lint-results-*.*'
+                    retention-days: 7
+                    if-no-files-found: ignore

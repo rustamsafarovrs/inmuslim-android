@@ -28,7 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew installGitHooks                    # pre-commit hook: detekt + lint
 ```
 
-The pre-commit hook (`scripts/git-hooks/pre-commit.sh`) runs `detekt` **and** `lint` and blocks the commit on failure — run both locally before committing. CI (`.github/workflows/detekt-action.yml`) runs `./gradlew detekt` on every push and PR.
+The pre-commit hook (`scripts/git-hooks/pre-commit.sh`) runs `detekt` **and** `lint` and blocks the commit on failure — run both locally before committing. CI (`.github/workflows/static-analysis.yml`) runs `./gradlew detekt` and `./gradlew lint` as two parallel jobs on every push and PR; `.github/workflows/test-action.yml` runs the unit tests.
 
 **Signing**: put these in `local.properties`; keystores live in `config/`.
 
