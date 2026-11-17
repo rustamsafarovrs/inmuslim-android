@@ -22,7 +22,17 @@ class Preferences(context: Context) {
         const val PREFS_FIREBASE_TOKEN = "firebase_token"
         const val PREFS_REVIEW_SHOWN = "review_shown"
         const val KEY_HAPTIC_ENABLED = "haptic_enabled"
+        const val PREFS_DEFAULT_LOCALE_APPLIED = "default_locale_applied"
     }
+
+    val isEmpty: Boolean
+        get() = prefs.all.isEmpty()
+
+    var isDefaultLocaleApplied: Boolean
+        get() = prefs.getBoolean(PREFS_DEFAULT_LOCALE_APPLIED, false)
+        set(value) {
+            editor.putBoolean(PREFS_DEFAULT_LOCALE_APPLIED, value).apply()
+        }
 
     fun saveRegionId(id: Long) {
         editor.putLong(PREFS_REGION_ID, id).apply()

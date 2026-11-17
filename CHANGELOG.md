@@ -2,7 +2,10 @@
 
 ## 1.5.0
 
-
+* Updates:
+  * New installs start in Tajik regardless of the device language (Android 13+).
+* Bug Fixes:
+  * Choosing Tajik as the app language now shows the app in Tajik instead of the device's English or Russian.
 
 ## 1.4.0
 
