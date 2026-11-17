@@ -22,11 +22,19 @@ android {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
     }
+    testFixtures {
+        enable = true
+    }
     kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.java.get()))
         }
     }
+}
+
+androidComponents {
+    // Test fixtures would otherwise give this module an instrumented test APK with nothing to run.
+    beforeVariants { it.androidTest.enable = false }
 }
 
 dependencies {
@@ -35,4 +43,6 @@ dependencies {
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.hilt.android.compiler)
+
+    testImplementation(libs.junit)
 }

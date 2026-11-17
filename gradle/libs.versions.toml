@@ -28,6 +28,7 @@ espresso = "3.7.0"
 kotlinxSerializationJson = "1.13.0"
 composeStabilityAnalyzer = "0.7.4"
 room = "2.8.5"
+coroutines = "1.10.2"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -67,6 +68,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitAndroid" }
 androidx-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
 androidx-compose-ui-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }

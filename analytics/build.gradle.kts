@@ -22,6 +22,9 @@ android {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
     }
+    testFixtures {
+        enable = true
+    }
     kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.java.get()))
@@ -31,6 +34,11 @@ android {
 
 kotlin {
     explicitApi()
+}
+
+androidComponents {
+    // Test fixtures would otherwise give this module an instrumented test APK with nothing to run.
+    beforeVariants { it.androidTest.enable = false }
 }
 
 dependencies {

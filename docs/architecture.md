@@ -436,29 +436,49 @@ JVM without Room or Retrofit. If a mapper depends on "now", take it as a paramet
 
 ### Where each layer is tested
 
-| What                              | Kind                    | Source set      | Runs in CI |
-|-----------------------------------|-------------------------|-----------------|------------|
-| Mappers, date helpers             | JVM unit                | `src/test`        | yes        |
-| Use cases                         | JVM unit + fake repo    | `src/test`        | yes        |
-| Room-backed repository            | Instrumented, in-memory Room | `src/androidTest` | no — run on a device |
-| Network repository                | Instrumented, fake `Api`     | `src/androidTest` | no — run on a device |
+Each module with tests has a `TESTING.md` listing what its tests cover and the gotchas:
+[`app`](../app/TESTING.md), [`core`](../core/TESTING.md), [`data`](../data/TESTING.md),
+[`analytics`](../analytics/TESTING.md), [`feature/tasbih`](../feature/tasbih/TESTING.md).
 
-CI (`test-action.yml`) runs `./gradlew testDebugUnitTest` only. Instrumented tests need a
-device or emulator.
+| What                                          | Kind                                    | Source set            | Runs in CI           |
+|-----------------------------------------------|-----------------------------------------|-----------------------|----------------------|
+| Mappers, date helpers, screen-state totals    | JVM unit                                | `src/test`            | yes                  |
+| Use cases                                     | JVM unit + fake repo                    | `src/test`            | yes                  |
+| ViewModels                                    | JVM unit + fakes, `MainDispatcherRule`  | `src/test`            | yes                  |
+| Network repositories                          | JVM unit, `FakeApi` + `inMemoryPreferences()` | `app/src/test`  | yes                  |
+| ViewModels that read their route from `SavedStateHandle` | Instrumented, in-memory Room | `src/androidTest`     | no — run on a device |
+| DAO and Room-backed repository                | Instrumented, in-memory Room            | `src/androidTest`     | no — run on a device |
+| `DefaultLocaleInitializer`, `toAnalyticsScreen()` | Instrumented                        | `app/src/androidTest` | no — run on a device |
+
+CI (`test-action.yml`) runs `./gradlew testDebugUnitTest` only. AGP creates unit tests for the
+debug build type only, so `./gradlew test` runs the same set. Instrumented tests need a device or
+emulator; `connectedDebugAndroidTest` installs the APKs and uninstalls them afterwards.
 
 ```bash
-./gradlew :feature:tasbih:testDebugUnitTest                       # JVM tests for the module
+./gradlew testDebugUnitTest                                       # every JVM test
 ./gradlew :feature:tasbih:testDebugUnitTest --tests '*GetTasbihUseCaseTest'
-./gradlew :feature:tasbih:connectedDebugAndroidTest               # instrumented, device required
+./gradlew connectedDebugAndroidTest                               # every instrumented test, device required
 ```
 
 ### Tooling
 
-The test classpath is plain **JUnit 4** — no mocking library, no `kotlinx-coroutines-test`,
-no Turbine. That shapes how tests are written:
+**JUnit 4** plus **`kotlinx-coroutines-test`** — no mocking library, no Turbine, no Robolectric.
+That shapes how tests are written:
 
-- **Fakes, not mocks.** Implement the repository interface in a small private class. Methods the
-  test doesn't need throw `error("unused")`, so an unexpected call fails loudly.
+- **Fakes, not mocks.** A fake implements the interface and answers with whatever the test
+  assigns; anything left unassigned throws `error("unused")`, so an unexpected call fails loudly.
+- **Shared fakes are test fixtures** of the module that owns the type, so every module uses the
+  same one. Add them with `testImplementation(testFixtures(project(":analytics")))`:
+
+  | Fake                     | Module       | What it does                                                          |
+  |--------------------------|--------------|-----------------------------------------------------------------------|
+  | `FakeAnalyticsTracker`   | `:analytics` | records `events`, `screens`, `userIds` and `userProperties`           |
+  | `inMemoryPreferences()`  | `:data`      | a real `Preferences` over an in-memory `SharedPreferences`, no `Context` |
+  | `MainDispatcherRule`     | `:core`      | swaps `Dispatchers.Main` for an unconfined test dispatcher            |
+
+  Kotlin in test fixtures needs `android.experimental.enableTestFixturesKotlinSupport=true` in
+  `gradle.properties`. A fake only one module needs stays in its `src/test/.../fakes/`
+  (`FakeApi`, `FakeTasbihRepository`).
 - **`runBlocking`** to run suspend code, and terminal operators to read the flow:
   `.last()` for the final emission of a one-shot flow, `.first { it !is Resource.InProgress }`
   for a long-lived Room flow (which never completes), `.toList()` to assert the whole sequence.
@@ -476,21 +496,12 @@ From `GetTasbihUseCaseTest`:
 ```kotlin
 class GetTasbihUseCaseTest {
 
-    private class FakeTasbihRepository(
-        private val name: Resource<String>,
-        private val count: Resource<Int>,
-    ) : TasbihRepository {
-
-        override fun getTasbihName(tasbihId: Long): Flow<Resource<String>> = flowOf(name)
-
-        override fun getTodayCount(tasbihId: Long): Flow<Resource<Int>> = flowOf(count)
-
-        override fun observeTasbihs(): Flow<Resource<List<Tasbih>>> = error("unused")
-        // ... every other method: error("unused")
-    }
-
-    private fun useCase(name: Resource<String>, count: Resource<Int>) =
-        GetTasbihUseCase(FakeTasbihRepository(name, count))
+    private fun useCase(name: Resource<String>, count: Resource<Int>) = GetTasbihUseCase(
+        FakeTasbihRepository().apply {
+            tasbihName = flowOf(name)
+            todayCount = flowOf(count)
+        },
+    )
 
     @Test
     fun `combines the name and today count into one tasbih`() = runBlocking {
@@ -519,9 +530,56 @@ class GetTasbihUseCaseTest {
 }
 ```
 
-Cover each branch: success, each source failing, and the in-progress state. Once a second test
-class needs the same fake, move it to `src/test/.../fakes/` and make its responses configurable
-instead of copying it.
+Cover each branch: success, each source failing, and the in-progress state. When a test needs a
+repository call `FakeTasbihRepository` doesn't answer yet, add a property to it rather than
+writing another fake.
+
+### Testing a ViewModel
+
+`viewModelScope` runs on `Dispatchers.Main`, so add `MainDispatcherRule`. Its unconfined
+dispatcher runs launched coroutines eagerly: the state is up to date as soon as the constructor or
+`handleEvent` returns, no `advanceUntilIdle()` needed. Hand the fake a `MutableStateFlow` to step
+the screen through `InProgress` → `Success` / `Error`. From `TasbihListViewModelTest`:
+
+```kotlin
+class TasbihListViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val analytics = FakeAnalyticsTracker()
+    private val tasbihs = MutableStateFlow<Resource<List<Tasbih>>>(Resource.InProgress())
+    private val repository = FakeTasbihRepository().also { it.tasbihs = tasbihs }
+
+    private fun viewModel() = TasbihListViewModel(
+        analytics,
+        ObserveTasbihsUseCase(repository),
+        AddTasbihUseCase(repository),
+    )
+
+    @Test
+    fun `shows an error when loading fails and clears it once the tasbihs arrive`() {
+        val viewModel = viewModel()
+        val error = IllegalStateException("boom")
+
+        tasbihs.value = Resource.Error(error = error)
+        assertEquals(error, viewModel.state.base.error)
+
+        tasbihs.value = Resource.Success(emptyList())
+        assertNull(viewModel.state.base.error)
+    }
+}
+```
+
+- The `:app` ViewModels take concrete repositories: build real ones from `FakeApi`,
+  `inMemoryPreferences()` and `ErrorHandler()`. To see a loading state, `api.holdResponses()`
+  keeps every call suspended until `api.releaseResponses()`.
+- A `Channel`-backed `*VMEvent` flow is read with `runTest { viewModel.event.first() }`.
+- **`SavedStateHandle.toRoute()` needs a real `Bundle`**, so a ViewModel that reads its route
+  (`TasbihViewModel`, `TasbihEntryHistoryViewModel`) is tested in `androidTest` against an
+  in-memory Room repository. There it runs on the real main thread while Room writes on its own
+  executor, so wait with `awaitUntil({ viewModel.state }) { it.name.isNotEmpty() }` before
+  asserting, and cancel `viewModelScope` in `@After` before closing the database.
 
 ### Testing a repository
 
@@ -547,8 +605,9 @@ fun `sums the day total across tasbihs`() {
 ```
 
 **2. Data access — instrumented test.** `TasbihRepositoryImpl` needs a real `TasbihDatabase`
-(for `withTransaction`) and `Preferences`, which takes a `Context`. Neither can be built on the
-plain JVM, so these tests go in `src/androidTest` and use an in-memory database:
+(for `withTransaction`), which can't be built on the plain JVM, so these tests go in
+`src/androidTest` and use an in-memory database. `TasbihDaoTest` covers the SQL itself (per-day
+counts, ordering, the `count > 0` filters, cascade delete) the same way:
 
 ```kotlin
 @RunWith(AndroidJUnit4::class)
@@ -607,39 +666,31 @@ class TasbihRepositoryImplTest {
   preference (e.g. haptics) should set the value it expects up front rather than rely on the
   default.
 
-**Network repositories** follow the same pattern: `Api` is an interface, so pass a fake that
-returns `Result.success(dto)` / `Result.failure(exception)`, and use the real `ErrorHandler`
-(it's a plain class). They also take `Preferences`, so they live in `app/src/androidTest`:
+**Network repositories run on the JVM.** `Api` is an interface and `inMemoryPreferences()`
+stands in for `Preferences`, so build the real repository with `FakeApi` and the real
+`ErrorHandler` (it's a plain class). From `RegionRepositoryTest`:
 
 ```kotlin
-@RunWith(AndroidJUnit4::class)
 class RegionRepositoryTest {
 
-    private class FakeApi(private val regions: Result<GetRegionsDTO>) : Api {
-        override suspend fun getRegions() = regions
-        override suspend fun getTiming(regionId: Long): Result<GetTimingDTO> = error("unused")
-        override suspend fun registerUser(body: RegisterUserBodyDTO): Result<RegisterUserDTO> = error("unused")
-        override suspend fun updateMessagingId(body: UpdateMessagingIdBodyDTO): Result<UpdateMessagingIdDTO> =
-            error("unused")
-    }
-
-    private fun repository(regions: Result<GetRegionsDTO>): RegionRepository {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        return RegionRepository(FakeApi(regions), Preferences(context), ErrorHandler())
-    }
+    private val api = FakeApi()
+    private val preferences = inMemoryPreferences()
+    private val repository = RegionRepository(api, preferences, ErrorHandler())
 
     @Test
-    fun mapsRegionsOnSuccess() = runBlocking {
-        val dto = GetRegionsDTO(result = 0, msg = "", regions = listOf(RegionDTO(1, "Dushanbe")))
+    fun `maps the regions`() = runBlocking {
+        api.regions = Result.success(GetRegionsDTO(result = 0, msg = "", regions = listOf(RegionDTO(1, "Dushanbe"))))
 
-        val rs = repository(Result.success(dto)).getRegions().last()
+        val rs = repository.getRegions().last()
 
         assertEquals(listOf(Region(1, "Dushanbe")), (rs as Resource.Success).data)
     }
 
     @Test
-    fun reportsNoConnectionWhenHostIsUnreachable() = runBlocking {
-        val rs = repository(Result.failure(UnknownHostException())).getRegions().last()
+    fun `reports no connection when the host is unreachable`() = runBlocking {
+        api.regions = Result.failure(UnknownHostException())
+
+        val rs = repository.getRegions().last()
 
         assertTrue((rs as Resource.Error).error is ConnectionTimeoutException)
     }
@@ -650,5 +701,10 @@ What to cover for a network call: success with `result == 0`, a body with `resul
 `UnknownHostException` / `IOException` (→ `ConnectionTimeoutException`) and an `HttpException`
 (→ `ApiException`).
 
-`UserRepository.updateMessagingId()` calls `FirebaseMessaging.getInstance()` directly and can't
-be tested this way until token fetching is moved behind an interface.
+Not reachable from tests yet:
+
+- `UserRepository.updateMessagingId()` calls `FirebaseMessaging.getInstance()` directly, so it
+  can't run until token fetching is moved behind an interface. `HomeViewModelTest` therefore
+  starts from a registered install that already has a push token.
+- Release-only branches such as `needRegister()` returning `true`: `BuildVars.BUILD_TYPE` is fixed
+  at compile time and unit tests only exist for debug.

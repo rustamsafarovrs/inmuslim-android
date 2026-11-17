@@ -105,6 +105,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(testFixtures(project(":analytics")))
+    testImplementation(testFixtures(project(":core")))
+    testImplementation(testFixtures(project(":data")))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso)
     androidTestImplementation(platform(libs.compose.bom))

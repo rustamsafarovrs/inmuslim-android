@@ -22,11 +22,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew :feature:tasbih:testDebugUnitTest  # one module's unit tests
 ./gradlew :feature:tasbih:testDebugUnitTest --tests '*TasbihDatesTest'         # one class
 ./gradlew :feature:tasbih:testDebugUnitTest --tests '*GetTasbihUseCaseTest.<method>'  # one test
+./gradlew connectedDebugAndroidTest           # instrumented tests (Room, SavedStateHandle VMs) — needs a device
 ./gradlew detekt                             # all modules
 ./gradlew :app:detekt --auto-correct         # formatting rules are auto-fixable
 ./gradlew lint                               # warningsAsErrors = true
 ./gradlew installGitHooks                    # pre-commit hook: detekt + lint
 ```
+
+Tests use JUnit 4 + `kotlinx-coroutines-test` with fakes, never mocks. Shared fakes are Gradle test fixtures of the module that owns the type: `FakeAnalyticsTracker` (`:analytics`), `inMemoryPreferences()` (`:data`), `MainDispatcherRule` (`:core`). Where each layer is tested and how: [`docs/architecture.md#testing`](docs/architecture.md#testing). Each module with tests has a `TESTING.md` covering what it tests and the module's gotchas; update it when you add or move tests.
 
 The pre-commit hook (`scripts/git-hooks/pre-commit.sh`) runs `detekt` **and** `lint` and blocks the commit on failure — run both locally before committing. CI (`.github/workflows/static-analysis.yml`) runs `./gradlew detekt` and `./gradlew lint` as two parallel jobs on every push and PR; `.github/workflows/test-action.yml` runs the unit tests.
 
