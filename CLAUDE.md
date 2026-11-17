@@ -67,7 +67,7 @@ Dependency direction: `app` → everything; `feature:tasbih` → `analytics`, `c
 
 ## Architecture
 
-MVVM + unidirectional data flow, Compose UI throughout.
+MVVM + unidirectional data flow, Compose UI throughout. The full guide with examples — each layer, UIEvent/VMEvent, and how to test use cases and repositories — is [`docs/architecture.md`](docs/architecture.md).
 
 ```
 Composable  →  *UIEvent  →  ViewModel  →  UseCase (tasbih) / Repository  →  Api | Room | Preferences
