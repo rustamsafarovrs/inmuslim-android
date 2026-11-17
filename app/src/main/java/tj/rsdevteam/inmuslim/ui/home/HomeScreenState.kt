@@ -8,12 +8,6 @@ data class HomeScreenState(
     val showLoading: Boolean = false,
     val timing: Timing? = null,
     val isReviewShown: Boolean = false,
-    val currentPrayer: ActivePrayer? = null,
-)
-
-data class ActivePrayer(
-    val nameResId: Int,
-    val startTimeRaw: String,
-    val endInMinutes: Int,
-    val progress: Float,
+    val hero: PrayerHero? = null,
+    val statuses: Map<Prayer, PrayerStatus> = emptyMap(),
 )

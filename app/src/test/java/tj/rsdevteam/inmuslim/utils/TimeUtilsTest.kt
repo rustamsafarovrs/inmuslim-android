@@ -1,9 +1,7 @@
 package tj.rsdevteam.inmuslim.utils
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
-import tj.rsdevteam.inmuslim.data.models.Timing
 
 class TimeUtilsTest {
 
@@ -34,32 +32,7 @@ class TimeUtilsTest {
     }
 
     @Test
-    fun testFindCurrentPrayer() {
-        val timing = Timing(
-            fajr = "04:00:10",
-            sunrise = "06:00",
-            zuhr = "13:00",
-            asr = "16:00",
-            sunset = "19:00",
-            maghrib = "19:05",
-            isha = "21:00",
-        )
-
-        // fajrResId=1, zuhrResId=2, asrResId=3, maghribResId=4, ishaResId=5 for testing
-
-        // Makruh sunset period (19:00–19:04): no prayer active
-        assertNull(TimeUtils.findCurrentPrayer(timing, 19 * 60, 1, 2, 3, 4, 5))
-        assertNull(TimeUtils.findCurrentPrayer(timing, 19 * 60 + 4, 1, 2, 3, 4, 5))
-
-        // Before Fajr (Isha from previous day)
-        assertEquals(5, TimeUtils.findCurrentPrayer(timing, 3 * 60, 1, 2, 3, 4, 5)?.nameResId)
-        assertEquals("21:00", TimeUtils.findCurrentPrayer(timing, 3 * 60, 1, 2, 3, 4, 5)?.startTimeRaw)
-
-        // At Fajr
-        assertEquals(1, TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.nameResId)
-        assertEquals("04:00:10", TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.startTimeRaw)
-        assertEquals(6 * 60 - 1, TimeUtils.findCurrentPrayer(timing, 4 * 60, 1, 2, 3, 4, 5)?.endInMinutes)
-
+    fun testFormatPrayerBoundaries() {
         // Formatting for display (24-hour)
         assertEquals("04:00", TimeUtils.formatTime("04:00:10"))
         assertEquals("05:59", TimeUtils.formatMinutes(6 * 60 - 1))
@@ -69,5 +42,18 @@ class TimeUtilsTest {
         assertEquals("3:59 AM", TimeUtils.formatMinutes(3 * 60 + 59, false))
         assertEquals("1:00 PM", TimeUtils.formatTime("13:00", false))
         assertEquals("3:59 PM", TimeUtils.formatMinutes(16 * 60 - 1, false))
+    }
+
+    @Test
+    fun testFormatCountdown() {
+        assertEquals("0:00", TimeUtils.formatCountdown(0))
+        assertEquals("0:59", TimeUtils.formatCountdown(59))
+        assertEquals("1:00", TimeUtils.formatCountdown(60))
+        assertEquals("45:12", TimeUtils.formatCountdown(45 * 60 + 12))
+        assertEquals("59:59", TimeUtils.formatCountdown(3599))
+        assertEquals("1:00:00", TimeUtils.formatCountdown(3600))
+        assertEquals("1:29:30", TimeUtils.formatCountdown(89 * 60 + 30))
+        assertEquals("12:00:00", TimeUtils.formatCountdown(12 * 3600))
+        assertEquals("0:00", TimeUtils.formatCountdown(-5))
     }
 }

@@ -48,7 +48,7 @@ fun InmuslimTheme(
 
 val LightColors = lightColorScheme(
     primary = Color(0xFF01B6D5),
-    onPrimary = Color(0xFF00C6EA),
+    onPrimary = Color(0xFF00262E),
     primaryContainer = Color(0xFFE6F7FF),
     onPrimaryContainer = Color(0xFF0091B6),
     secondary = Color(0xFF53D9F9),

@@ -1,10 +1,12 @@
 package tj.rsdevteam.inmuslim.utils
 
-import tj.rsdevteam.inmuslim.data.models.Timing
 import java.util.Calendar
 import java.util.Locale
 
 object TimeUtils {
+
+    private const val SECONDS_IN_MINUTE = 60
+    private const val SECONDS_IN_HOUR = 60 * SECONDS_IN_MINUTE
 
     fun timeToMinutes(time: String): Int {
         val parts = time.split(":")
@@ -32,48 +34,23 @@ object TimeUtils {
         return time
     }
 
-    fun getCurrentTimeInMinutes(): Int {
+    fun getCurrentTimeInSeconds(): Int {
         val calendar = Calendar.getInstance()
         val h = calendar.get(Calendar.HOUR_OF_DAY)
         val m = calendar.get(Calendar.MINUTE)
-        return h * 60 + m
+        val s = calendar.get(Calendar.SECOND)
+        return h * SECONDS_IN_HOUR + m * SECONDS_IN_MINUTE + s
     }
 
-    data class PrayerInfo(
-        val nameResId: Int,
-        val startTimeRaw: String,
-        val startInMinutes: Int,
-        val endInMinutes: Int,
-    )
-
-    @Suppress("LongParameterList")
-    fun findCurrentPrayer(
-        timing: Timing,
-        now: Int,
-        fajrResId: Int,
-        zuhrResId: Int,
-        asrResId: Int,
-        maghribResId: Int,
-        ishaResId: Int,
-    ): PrayerInfo? {
-        val f = timeToMinutes(timing.fajr)
-        val sr = timeToMinutes(timing.sunrise)
-        val z = timeToMinutes(timing.zuhr)
-        val a = timeToMinutes(timing.asr)
-        val s = timeToMinutes(timing.sunset)
-        val m = timeToMinutes(timing.maghrib)
-        val i = timeToMinutes(timing.isha)
-
-        return when {
-            now in f until sr -> PrayerInfo(fajrResId, timing.fajr, f, sr - 1)
-            now in z until a -> PrayerInfo(zuhrResId, timing.zuhr, z, a - 1)
-            now in a until s -> PrayerInfo(asrResId, timing.asr, a, s - 1)
-            now in m until (m + 40) -> PrayerInfo(maghribResId, timing.maghrib, m, m + 39)
-            now >= i || now < f -> {
-                val iMinutes = if (now < f) i - 24 * 60 else i
-                PrayerInfo(ishaResId, timing.isha, iMinutes, f - 1)
-            }
-            else -> null
+    internal fun formatCountdown(seconds: Int): String {
+        val total = seconds.coerceAtLeast(0)
+        val h = total / SECONDS_IN_HOUR
+        val m = total % SECONDS_IN_HOUR / SECONDS_IN_MINUTE
+        val s = total % SECONDS_IN_MINUTE
+        return if (h > 0) {
+            String.format(Locale.getDefault(), "%d:%02d:%02d", h, m, s)
+        } else {
+            String.format(Locale.getDefault(), "%d:%02d", m, s)
         }
     }
 

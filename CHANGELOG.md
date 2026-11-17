@@ -4,6 +4,7 @@
 
 * Updates:
   * New installs start in Tajik regardless of the device language (Android 13+).
+  * Redesigned home screen: the current or next prayer with a live countdown, and the day's schedule grouped around sunrise and sunset.
 * Bug Fixes:
   * Choosing Tajik as the app language now shows the app in Tajik instead of the device's English or Russian.
 
