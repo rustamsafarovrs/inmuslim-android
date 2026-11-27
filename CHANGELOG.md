@@ -1,5 +1,16 @@
 # Inmuslim Changelog
 
+## 1.5.0
+
+* Updates:
+  * New installs start in Tajik regardless of the device language (Android 13+).
+  * Redesigned home screen: the current or next prayer with a live countdown, and the day's schedule grouped around sunrise and sunset.
+* Bug Fixes:
+  * Choosing Tajik as the app language now shows the app in Tajik instead of the device's English or Russian.
+  * Error messages are shown in the app's language instead of English.
+  * Prayer times switch to the new day's times at midnight, and a failed load is retried when the app is opened again.
+  * The rating prompt waits until the app has been used on three different days instead of appearing right after setup.
+
 ## 1.4.0
 
 * New Features:

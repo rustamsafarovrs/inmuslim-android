@@ -8,15 +8,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
 import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.repositories.TimingRepository
 import tj.rsdevteam.inmuslim.data.repositories.UserRepository
-import tj.rsdevteam.inmuslim.res.R
 import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.Utils
+import tj.rsdevteam.inmuslim.utils.WallClock
+import tj.rsdevteam.inmuslim.utils.toErrorText
 import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheetConfig
 import javax.inject.Inject
 
@@ -31,15 +33,18 @@ class HomeViewModel
     private val analytics: AnalyticsTracker,
     private val timingRepository: TimingRepository,
     private val userRepository: UserRepository,
+    private val clock: WallClock,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeScreenState())
         private set
 
-    private var prayerEndJob: Job? = null
+    private var clockJob: Job? = null
+
+    // Null after a failed load: the next DidStart retries it, the clock doesn't
+    private var timingDate: String? = null
 
     init {
-        state = state.copy(isReviewShown = userRepository.isReviewShown())
         if (userRepository.getUserId() != -1L) {
             if (userRepository.getFirebaseToken().isEmpty()) {
                 updateMessagingId()
@@ -48,11 +53,8 @@ class HomeViewModel
         refresh()
     }
 
-    override fun onCleared() {
-        prayerEndJob?.cancel()
-    }
-
     private fun getTiming() {
+        timingDate = today()
         viewModelScope.launch {
             val isFirstLoad = state.timing == null
             timingRepository.getTiming().collect { rs ->
@@ -60,16 +62,14 @@ class HomeViewModel
                     is Resource.InProgress -> Unit
                     is Resource.Success -> {
                         state = state.copy(timing = rs.data)
-                        calculateCurrentPrayer()
+                        updateSchedule()
                     }
 
                     is Resource.Error -> {
+                        timingDate = null
                         analytics.log(AnalyticsEvent.TimingLoadFailed(rs.error?.message))
                         state = state.copy(
-                            errorBottomSheetConfig = ErrorBottomSheetConfig(
-                                msg = rs.error?.message,
-                                title = "Error",
-                            ),
+                            errorBottomSheetConfig = ErrorBottomSheetConfig(msg = rs.error.toErrorText()),
                         )
                     }
                 }
@@ -114,6 +114,8 @@ class HomeViewModel
             is HomeUIEvent.Refresh -> refresh()
             is HomeUIEvent.ReviewShowed -> reviewShowed()
             is HomeUIEvent.DismissDialog -> dismissDialog()
+            is HomeUIEvent.DidStart -> didStart()
+            is HomeUIEvent.DidStop -> clockJob?.cancel()
         }
     }
 
@@ -127,66 +129,44 @@ class HomeViewModel
     fun reviewShowed() {
         analytics.log(AnalyticsEvent.InAppReviewRequested)
         userRepository.saveReviewShown()
-        state = state.copy(isReviewShown = true)
+        state = state.copy(shouldRequestReview = false)
     }
 
     fun dismissDialog() {
         state = state.copy(errorBottomSheetConfig = null)
     }
 
-    private fun calculateCurrentPrayer() {
-        val timing = state.timing ?: return
-        val now = TimeUtils.getCurrentTimeInMinutes()
-
-        val info = TimeUtils.findCurrentPrayer(
-            timing = timing,
-            now = now,
-            fajrResId = R.string.base_prayer_fajr,
-            zuhrResId = R.string.base_prayer_zuhr,
-            asrResId = R.string.base_prayer_asr,
-            maghribResId = R.string.base_prayer_maghrib,
-            ishaResId = R.string.base_prayer_isha,
-        )
-
-        if (info != null) {
-            val total = if (info.endInMinutes > info.startInMinutes) {
-                info.endInMinutes - info.startInMinutes
-            } else {
-                (info.endInMinutes + 24 * 60) - info.startInMinutes
-            }
-            val currentNow = if (now < info.startInMinutes && info.endInMinutes <= info.startInMinutes) {
-                now + 24 * 60
-            } else {
-                now
-            }
-            val progress = (currentNow - info.startInMinutes).toFloat() / total
-            state = state.copy(
-                currentPrayer = ActivePrayer(
-                    nameResId = info.nameResId,
-                    startTimeRaw = info.startTimeRaw,
-                    endInMinutes = info.endInMinutes,
-                    progress = progress.coerceIn(0f, 1f),
-                ),
-            )
-        } else {
-            state = state.copy(currentPrayer = null)
-        }
-
-        schedulePrayerEndRefresh()
-    }
-
-    private fun schedulePrayerEndRefresh() {
-        prayerEndJob?.cancel()
-        val endInMinutes = state.currentPrayer?.endInMinutes ?: return
-        val now = TimeUtils.getCurrentTimeInMinutes()
-        val delayMinutes = if (endInMinutes >= now) {
-            endInMinutes + 1 - now
-        } else {
-            endInMinutes + 24 * 60 + 1 - now
-        }
-        prayerEndJob = viewModelScope.launch {
-            delay(delayMinutes * 60_000L)
+    private fun didStart() {
+        val today = today()
+        userRepository.recordVisit(today)
+        state = state.copy(shouldRequestReview = userRepository.shouldRequestReview())
+        if (timingDate != today) {
             getTiming()
         }
+        clockJob?.cancel()
+        clockJob = viewModelScope.launch {
+            while (isActive) {
+                if (timingDate != null && timingDate != today()) {
+                    getTiming()
+                }
+                updateSchedule()
+                delay(MILLIS_IN_SECOND - clock.millis() % MILLIS_IN_SECOND)
+            }
+        }
+    }
+
+    private fun updateSchedule() {
+        val timing = state.timing ?: return
+        val now = TimeUtils.secondsOfDay(clock.millis())
+        val hero = PrayerSchedule.heroAt(timing, now)
+        val statuses = PrayerSchedule.statusesAt(timing, hero, now)
+        // Same map instance lets HomeSchedule skip recomposing on every tick
+        state = state.copy(hero = hero, statuses = if (statuses == state.statuses) state.statuses else statuses)
+    }
+
+    private fun today() = TimeUtils.isoDate(clock.millis())
+
+    private companion object {
+        const val MILLIS_IN_SECOND = 1_000L
     }
 }

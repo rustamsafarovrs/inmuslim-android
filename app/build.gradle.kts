@@ -19,8 +19,8 @@ android {
         applicationId = "tj.rsdevteam.inmuslim"
         minSdk = libs.versions.androidMinSdk.get().toInt()
         targetSdk = libs.versions.androidSdk.get().toInt()
-        versionCode = 9
-        versionName = "1.4.0"
+        versionCode = 10
+        versionName = "1.5.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
         manifestPlaceholders["appName"] = "@string/app_name"
@@ -67,6 +67,11 @@ android {
         compose = true
         buildConfig = true
     }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -100,6 +105,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(testFixtures(project(":analytics")))
+    testImplementation(testFixtures(project(":core")))
+    testImplementation(testFixtures(project(":data")))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso)
     androidTestImplementation(platform(libs.compose.bom))

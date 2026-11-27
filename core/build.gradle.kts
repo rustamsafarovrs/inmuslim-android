@@ -30,6 +30,9 @@ android {
         compose = true
         buildConfig = true
     }
+    testFixtures {
+        enable = true
+    }
     kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.java.get()))
@@ -51,6 +54,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
+    testFixturesApi(libs.junit)
+    testFixturesApi(libs.kotlinx.coroutines.test)
+    testFixturesImplementation(platform(libs.compose.bom))
+    testFixturesImplementation(libs.androidx.compose.ui)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso)
     androidTestImplementation(platform(libs.compose.bom))

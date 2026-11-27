@@ -16,6 +16,7 @@ import tj.rsdevteam.inmuslim.core.config.BuildVars
 import tj.rsdevteam.inmuslim.data.api.Api
 import tj.rsdevteam.inmuslim.data.constants.Constants
 import tj.rsdevteam.inmuslim.data.repositories.ErrorHandler
+import tj.rsdevteam.inmuslim.utils.WallClock
 import java.util.concurrent.TimeUnit
 
 /**
@@ -74,5 +75,10 @@ class AppModule {
     @Provides
     fun provideApi(retrofit: Retrofit): Api {
         return retrofit.create(Api::class.java)
+    }
+
+    @Provides
+    fun provideWallClock(): WallClock {
+        return WallClock { System.currentTimeMillis() }
     }
 }

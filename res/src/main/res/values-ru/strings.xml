@@ -8,7 +8,13 @@
     <string name="base_prayer_sunset">Закат</string>
     <string name="base_prayer_maghrib">Магриб</string>
     <string name="base_prayer_isha">Иша</string>
-    <string name="base_title_current_prayer">Текущее время молитвы</string>
+    <string name="base_title_next_prayer">Следующая молитва</string>
+    <string name="base_other_prayer_now">Сейчас время молитвы</string>
+    <string name="base_other_no_prayer_now">Сейчас не время молитвы</string>
+    <string name="base_other_tag_now">СЕЙЧАС</string>
+    <string name="base_other_tag_next">ДАЛЕЕ</string>
+    <string name="base_other_until_end">%1$s до конца</string>
+    <string name="base_other_until_start">%1$s до начала</string>
     <string name="base_title_select_region">Выберите регион или город</string>
     <string name="base_action_change_region">Изменить регион</string>
     <string name="base_description_change_region">Сменить регион в другой</string>
@@ -26,6 +32,9 @@
     <string name="common_description_change_language">Выбрать язык приложения</string>
     <string name="common_other_today">Сегодня</string>
     <string name="common_other_yesterday">Вчера</string>
+    <string name="common_action_ok">ОК</string>
+    <string name="common_description_no_connection">Нет подключения к интернету</string>
+    <string name="common_description_unknown_error">Что-то пошло не так. Попробуйте позже.</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Тасбих</string>

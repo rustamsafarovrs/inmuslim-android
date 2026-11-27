@@ -22,11 +22,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew :feature:tasbih:testDebugUnitTest  # one module's unit tests
 ./gradlew :feature:tasbih:testDebugUnitTest --tests '*TasbihDatesTest'         # one class
 ./gradlew :feature:tasbih:testDebugUnitTest --tests '*GetTasbihUseCaseTest.<method>'  # one test
+./gradlew connectedDebugAndroidTest           # instrumented tests (Room, SavedStateHandle VMs) — needs a device
 ./gradlew detekt                             # all modules
 ./gradlew :app:detekt --auto-correct         # formatting rules are auto-fixable
 ./gradlew lint                               # warningsAsErrors = true
 ./gradlew installGitHooks                    # pre-commit hook: detekt + lint
 ```
+
+Tests use JUnit 4 + `kotlinx-coroutines-test` with fakes, never mocks. Shared fakes are Gradle test fixtures of the module that owns the type: `FakeAnalyticsTracker` (`:analytics`), `inMemoryPreferences()` (`:data`), `MainDispatcherRule` (`:core`). Where each layer is tested and how: [`docs/architecture.md#testing`](docs/architecture.md#testing). Each module with tests has a `TESTING.md` covering what it tests and the module's gotchas; update it when you add or move tests.
 
 The pre-commit hook (`scripts/git-hooks/pre-commit.sh`) runs `detekt` **and** `lint` and blocks the commit on failure — run both locally before committing. CI (`.github/workflows/static-analysis.yml`) runs `./gradlew detekt` and `./gradlew lint` as two parallel jobs on every push and PR; `.github/workflows/test-action.yml` runs the unit tests.
 
@@ -67,7 +70,7 @@ Dependency direction: `app` → everything; `feature:tasbih` → `analytics`, `c
 
 ## Architecture
 
-MVVM + unidirectional data flow, Compose UI throughout.
+MVVM + unidirectional data flow, Compose UI throughout. The full guide with examples — each layer, UIEvent/VMEvent, and how to test use cases and repositories — is [`docs/architecture.md`](docs/architecture.md).
 
 ```
 Composable  →  *UIEvent  →  ViewModel  →  UseCase (tasbih) / Repository  →  Api | Room | Preferences
@@ -155,7 +158,7 @@ Adds a layer the rest of the app doesn't have: `domain/usecases/*UseCase` classe
 
 **Formatting belongs in the UI layer.** ViewModels and domain models keep raw data (`"04:00:10"` strings, minutes as `Int`, ISO dates). Composables read `LocalContext.current.is24HourFormat()` once and pass it to `TimeUtils.formatTime` / `TimeUtils.formatMinutes` at display time; counts go through `NumberFormatter.format`. Never pre-format in a ViewModel or store a formatted copy of a domain model in state.
 
-**Strings** all live in `:res` (`values/` is Tajik — the default — plus `values-en/` and `values-ru/`), named `<scope>_<kind>_<name>`: `base_*`, `common_*`, `tasbih_*` with kinds `title`, `action`, `description`, `prayer`, `other`. Add a new string to all three locale files. For text that must travel through non-Composable layers, use the `TextRes` sealed class (`Raw` / `Res` / `ResParams`) and resolve it with `TextRes.resolve()` or `Context.getTextRes(...)`.
+**Strings** all live in `:res` (`values/` is Tajik — the default — plus `values-en/` and `values-ru/`), named `<scope>_<kind>_<name>`: `base_*`, `common_*`, `tasbih_*` with kinds `title`, `action`, `description`, `prayer`, `other`. Add a new string to all three files. Don't create `values-tg/` by hand: the `generate<Variant>TajikStrings` task in `res/build.gradle.kts` generates it at build time from the translatable strings of `values/`. Android 13+ adds the device languages after the chosen app language and uses the first one that has its own folder, so without `values-tg/` choosing Tajik on an English or Russian phone falls through to `values-en`/`values-ru`. For the same reason `app/build.gradle.kts` turns off App Bundle language splits (`bundle.language.enableSplit = false`): with splits on, Play installs only the device's languages, so `values-tg/` would never reach an English or Russian phone. For text that must travel through non-Composable layers, use the `TextRes` sealed class (`Raw` / `Res` / `ResParams`) and resolve it with `TextRes.resolve()` or `Context.getTextRes(...)`.
 
 **Detekt** (`config/detekt/detekt.yml`, baseline `config/detekt/baseline.xml`): 120-char lines, 4-space indent, `CyclomaticComplexMethod` 15, `LongMethod` 60, `ReturnCount` 2, `LongParameterList` 6 (7 for constructors), `TooManyFunctions` 11, `MagicNumber` active, `ComplexCondition` 4. `FIXME:` and `STOPSHIP:` comments are forbidden. Prefer a scoped `@Suppress` with a clear reason over editing the baseline.
 
@@ -165,4 +168,6 @@ Adds a layer the rest of the app doesn't have: `domain/usecases/*UseCase` classe
 
 ## Local Persistence
 
-`Preferences` (`:data`) wraps a single `prefs` SharedPreferences file: `region_id`, `user_id`, `firebase_token`, `review_shown`, `haptic_enabled`. `-1L` is the "unset" sentinel for the two IDs.
+`Preferences` (`:data`) wraps a single `prefs` SharedPreferences file: `region_id`, `user_id`, `firebase_token`, `review_shown`, `haptic_enabled`, `default_locale_applied`, `visit_date`, `visit_days`. `-1L` is the "unset" sentinel for the two IDs. `visit_date`/`visit_days` count the distinct days Home was opened; `UserRepository.shouldRequestReview()` asks for an in-app review from the third one.
+
+`App.onCreate` runs `DefaultLocaleInitializer` once per install: on Android 13+, while `prefs` is still empty (a new install; an update from an older version already has data there and keeps its language) it sets the per-app language to `tg-TJ` via `LocaleManager` (the exact tag the system picker stores; it can't match a bare `tg`), unless Android restored a per-app language. Install timestamps aren't used: Play can update an app before its first launch. "Clear storage" counts as a new install, since Android wipes the per-app language along with the data. `default_locale_applied` is saved only once the language is set; a failure is swallowed and retried on the next launch while `prefs` is still empty. `LaunchActivity` declares `configChanges="locale|layoutDirection"` so the language change never restarts it. Below API 33 it does nothing, because "Change language" there opens the device-wide settings and the user couldn't switch back.

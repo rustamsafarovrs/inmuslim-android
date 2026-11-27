@@ -28,6 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import tj.rsdevteam.inmuslim.core.resolve
+import tj.rsdevteam.inmuslim.core.resolveOrEmpty
 import tj.rsdevteam.inmuslim.core.router.theme.InmuslimTypo
 import tj.rsdevteam.inmuslim.res.R
 import tj.rstech.uicomponents.PrimaryButton
@@ -45,6 +47,8 @@ fun ErrorBottomSheet(
     dismiss: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val title = errorBottomSheetConfig.title?.resolve() ?: stringResource(id = R.string.common_common_error_title)
+    val msg = errorBottomSheetConfig.msg.resolveOrEmpty()
     ModalBottomSheet(
         onDismissRequest = dismiss,
         sheetState = sheetState,
@@ -79,14 +83,14 @@ fun ErrorBottomSheet(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = errorBottomSheetConfig.title ?: stringResource(id = R.string.common_common_error_title),
+                text = title,
                 style = InmuslimTypo.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center,
             )
-            if (!errorBottomSheetConfig.msg.isNullOrBlank()) {
+            if (msg.isNotBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = errorBottomSheetConfig.msg,
+                    text = msg,
                     style = InmuslimTypo.bodyMedium.copy(fontSize = 14.sp),
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -94,7 +98,7 @@ fun ErrorBottomSheet(
             }
             Spacer(modifier = Modifier.height(24.dp))
             PrimaryButton(
-                title = "OK",
+                title = stringResource(id = R.string.common_action_ok),
                 clicked = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {

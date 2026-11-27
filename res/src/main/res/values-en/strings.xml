@@ -8,7 +8,13 @@
     <string name="base_prayer_sunset">Sunset</string>
     <string name="base_prayer_maghrib">Maghrib</string>
     <string name="base_prayer_isha">"Isha "</string>
-    <string name="base_title_current_prayer">Current prayer time</string>
+    <string name="base_title_next_prayer">Next prayer</string>
+    <string name="base_other_prayer_now">Prayer time now</string>
+    <string name="base_other_no_prayer_now">No prayer time now</string>
+    <string name="base_other_tag_now">NOW</string>
+    <string name="base_other_tag_next">NEXT</string>
+    <string name="base_other_until_end">%1$s left</string>
+    <string name="base_other_until_start">starts in %1$s</string>
     <string name="base_title_select_region">Select region or city</string>
     <string name="base_action_change_region">Change region</string>
     <string name="base_description_change_region">Change to another region</string>
@@ -26,6 +32,9 @@
     <string name="common_description_change_language">Select app language</string>
     <string name="common_other_today">Today</string>
     <string name="common_other_yesterday">Yesterday</string>
+    <string name="common_action_ok">OK</string>
+    <string name="common_description_no_connection">No internet connection</string>
+    <string name="common_description_unknown_error">Something went wrong. Please try again later.</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Tasbih</string>

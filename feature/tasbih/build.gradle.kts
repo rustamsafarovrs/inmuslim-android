@@ -63,6 +63,10 @@ dependencies {
     ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(testFixtures(project(":analytics")))
+    testImplementation(testFixtures(project(":core")))
+    androidTestImplementation(testFixtures(project(":analytics")))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso)
     androidTestImplementation(platform(libs.compose.bom))
