@@ -10,6 +10,7 @@ import org.junit.Test
 import tj.rsdevteam.inmuslim.analytics.AnalyticsEvent
 import tj.rsdevteam.inmuslim.analytics.AnalyticsProperty
 import tj.rsdevteam.inmuslim.analytics.FakeAnalyticsTracker
+import tj.rsdevteam.inmuslim.core.TextRes
 import tj.rsdevteam.inmuslim.core.testing.MainDispatcherRule
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.data.models.api.GetRegionsDTO
@@ -18,6 +19,7 @@ import tj.rsdevteam.inmuslim.data.preferences.inMemoryPreferences
 import tj.rsdevteam.inmuslim.data.repositories.ErrorHandler
 import tj.rsdevteam.inmuslim.data.repositories.RegionRepository
 import tj.rsdevteam.inmuslim.fakes.FakeApi
+import tj.rsdevteam.inmuslim.res.R
 import java.net.UnknownHostException
 
 class RegionViewModelTest {
@@ -66,7 +68,7 @@ class RegionViewModelTest {
 
         val viewModel = viewModel()
 
-        assertEquals("No internet connection", viewModel.state.sheetConfig?.msg)
+        assertEquals(TextRes.Res(R.string.common_description_no_connection), viewModel.state.sheetConfig?.msg)
         assertEquals(listOf(AnalyticsEvent.RegionsLoadFailed("No internet connection")), analytics.events)
     }
 

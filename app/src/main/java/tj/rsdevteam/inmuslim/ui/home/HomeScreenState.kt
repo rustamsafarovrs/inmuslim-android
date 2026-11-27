@@ -7,7 +7,7 @@ data class HomeScreenState(
     val errorBottomSheetConfig: ErrorBottomSheetConfig? = null,
     val showLoading: Boolean = false,
     val timing: Timing? = null,
-    val isReviewShown: Boolean = false,
+    val shouldRequestReview: Boolean = false,
     val hero: PrayerHero? = null,
     val statuses: Map<Prayer, PrayerStatus> = emptyMap(),
 )

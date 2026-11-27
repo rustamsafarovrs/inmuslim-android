@@ -16,14 +16,15 @@ How to test, in general: [`docs/architecture.md#testing`](../docs/architecture.m
 |                     | `ErrorHandlerTest`      | unreachable host / IO → `ConnectionTimeoutException`, HTTP → `ApiException`, `MessageDTO` → its `msg`, anything else → `UnknownException` |
 |                     | `RegionRepositoryTest`  | progress then result, mapping, rejected / offline responses, saved region |
 |                     | `TimingRepositoryTest`  | requests the saved region's times, mapping, error mapping                 |
-|                     | `UserRepositoryTest`    | registration saves the user id only on success; `needRegister()` in debug; review flag |
-| `ui.home`           | `HomeViewModelTest`     | times + hero + statuses, first-load loader, error sheet and dismiss, refresh, review flag |
+|                     | `UserRepositoryTest`    | registration saves the user id only on success; `needRegister()` in debug; review flag; review asked from the third day of use, never again once requested |
+| `ui.home`           | `HomeViewModelTest`     | times + hero + statuses, first-load loader, translated error sheet and dismiss, refresh, reload at midnight / on a later day / after a failed load but not when the prayer changes, review from the third day |
 |                     | `PrayerScheduleTest`    | which prayer is current or next at a given second, countdown, progress, statuses |
 |                     | `PrayerTest`            | `Timing.timeOf` reads each prayer's own field                             |
 | `ui.launch`         | `LaunchViewModelTest`   | onboarding vs main, `AppLaunched`, user id and region identity (`null`, never `"-1"`) |
 | `ui.region`         | `RegionViewModelTest`   | loading, error and retry, one region selected at a time, confirm saves and tags analytics |
 | `ui.settings`       | `SettingsViewModelTest` | each click is reported                                                    |
-| `utils`             | `TimeUtilsTest`         | parsing, 12/24-hour formatting, countdown                                 |
+| `utils`             | `ErrorTextTest`         | offline → "no connection" text, any other error → generic text          |
+|                     | `TimeUtilsTest`         | parsing, 12/24-hour formatting, countdown, time of day and date from a timestamp |
 
 ### Writing a ViewModel test
 
@@ -55,9 +56,10 @@ A `*VMEvent` sent through a `Channel` is read with `runTest { viewModel().event.
   register with `Utils.getDeviceInfo()` → `Build.*`, and neither works on the JVM.
 - **Unit tests only exist for debug**, where `BuildVars.BUILD_TYPE` is `TEST` and `needRegister()`
   is always `false`. The release branch can't be reached.
-- **The hero uses the real clock.** `HomeViewModelTest` checks that a hero and all seven statuses
-  exist. Which prayer is current at which second is `PrayerScheduleTest`'s job, which passes the
-  time in.
+- **`HomeViewModel` reads the time from an injected `WallClock`.** `HomeViewModelTest` passes
+  `{ now }` and sets `now`. `DidStart` starts a loop that ticks once a second; it stays suspended
+  until a test calls `tickTo(millis)`, which sets the clock and advances the test dispatcher by one
+  second. Which prayer is current at which second is still `PrayerScheduleTest`'s job.
 - **Known bug:** a response with `result != 0` loses the server's `msg`. `ErrorHandler` only reads
   it from a `MessageDTO`, which no response type is, so the error ends up as `UnknownException`.
   The repository tests only check that an `Error` comes back, so fixing this won't break them.

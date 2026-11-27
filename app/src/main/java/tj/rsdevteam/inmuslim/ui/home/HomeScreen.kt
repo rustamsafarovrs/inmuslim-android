@@ -50,8 +50,9 @@ fun HomeScreen() {
     val context = LocalContext.current
     val router = LocalRouter.current
 
-    LaunchedEffect(key1 = Unit) {
-        if (!viewModel.state.isReviewShown) {
+    val shouldRequestReview = viewModel.state.shouldRequestReview
+    LaunchedEffect(shouldRequestReview) {
+        if (shouldRequestReview) {
             context.findActivity().launchInAppReview { viewModel.handleEvent(HomeUIEvent.ReviewShowed) }
         }
     }

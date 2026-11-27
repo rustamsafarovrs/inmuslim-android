@@ -2,6 +2,7 @@ package tj.rsdevteam.inmuslim.utils
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.util.Calendar
 
 class TimeUtilsTest {
 
@@ -55,5 +56,16 @@ class TimeUtilsTest {
         assertEquals("1:29:30", TimeUtils.formatCountdown(89 * 60 + 30))
         assertEquals("12:00:00", TimeUtils.formatCountdown(12 * 3600))
         assertEquals("0:00", TimeUtils.formatCountdown(-5))
+    }
+
+    @Test
+    fun `reads the time of day and the date from a timestamp`() {
+        val millis = Calendar.getInstance().apply {
+            clear()
+            set(2026, Calendar.JANUARY, 5, 13, 30, 45)
+        }.timeInMillis
+
+        assertEquals(13 * 3600 + 30 * 60 + 45, TimeUtils.secondsOfDay(millis))
+        assertEquals("2026-01-05", TimeUtils.isoDate(millis))
     }
 }

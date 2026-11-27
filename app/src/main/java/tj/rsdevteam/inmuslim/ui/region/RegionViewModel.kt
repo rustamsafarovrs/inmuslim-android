@@ -13,6 +13,7 @@ import tj.rsdevteam.inmuslim.analytics.AnalyticsTracker
 import tj.rsdevteam.inmuslim.core.Resource
 import tj.rsdevteam.inmuslim.data.models.Region
 import tj.rsdevteam.inmuslim.data.repositories.RegionRepository
+import tj.rsdevteam.inmuslim.utils.toErrorText
 import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheetConfig
 import javax.inject.Inject
 
@@ -48,10 +49,7 @@ class RegionViewModel
                     is Resource.Error -> {
                         analytics.log(AnalyticsEvent.RegionsLoadFailed(rs.error?.message))
                         state = state.copy(
-                            sheetConfig = ErrorBottomSheetConfig(
-                                msg = rs.error?.message,
-                                title = "Error",
-                            ),
+                            sheetConfig = ErrorBottomSheetConfig(msg = rs.error.toErrorText()),
                         )
                     }
                 }

@@ -18,6 +18,8 @@ class PreferencesTest {
         assertFalse(preferences.isReviewShown())
         assertFalse(preferences.isHapticEnabled())
         assertFalse(preferences.isDefaultLocaleApplied)
+        assertEquals("", preferences.visitDate)
+        assertEquals(0, preferences.visitDays)
     }
 
     @Test
@@ -35,6 +37,8 @@ class PreferencesTest {
         preferences.saveReviewShown()
         preferences.setHapticEnabled(true)
         preferences.isDefaultLocaleApplied = true
+        preferences.visitDate = "2026-04-28"
+        preferences.visitDays = 2
 
         assertEquals(3L, preferences.getRegionId())
         assertEquals(42L, preferences.getUserId())
@@ -42,6 +46,8 @@ class PreferencesTest {
         assertTrue(preferences.isReviewShown())
         assertTrue(preferences.isHapticEnabled())
         assertTrue(preferences.isDefaultLocaleApplied)
+        assertEquals("2026-04-28", preferences.visitDate)
+        assertEquals(2, preferences.visitDays)
     }
 
     @Test

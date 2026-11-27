@@ -32,6 +32,9 @@
     <string name="common_description_change_language">Select app language</string>
     <string name="common_other_today">Today</string>
     <string name="common_other_yesterday">Yesterday</string>
+    <string name="common_action_ok">OK</string>
+    <string name="common_description_no_connection">No internet connection</string>
+    <string name="common_description_unknown_error">Something went wrong. Please try again later.</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Tasbih</string>

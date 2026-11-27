@@ -10,8 +10,8 @@ How to test, in general: [`docs/architecture.md#testing`](../docs/architecture.m
 
 JVM only (`src/test`), in `PreferencesTest`:
 
-- a new install is empty: both ids are `-1`, the token is `""`, and every flag is `false`
-  (haptics included)
+- a new install is empty: both ids are `-1`, the token and visit date are `""`, the visit day count
+  is `0`, and every flag is `false` (haptics included)
 - `isEmpty` turns false after the first write, which `DefaultLocaleInitializer` relies on
 - every value reads back as saved, and haptics can be turned back off
 

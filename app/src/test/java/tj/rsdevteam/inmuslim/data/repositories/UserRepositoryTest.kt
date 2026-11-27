@@ -68,4 +68,24 @@ class UserRepositoryTest {
 
         assertTrue(repository.isReviewShown())
     }
+
+    @Test
+    fun `asks for a review once the app was used on three different days`() {
+        repository.recordVisit("2026-04-28")
+        repository.recordVisit("2026-04-28")
+        repository.recordVisit("2026-04-29")
+        assertFalse(repository.shouldRequestReview())
+
+        repository.recordVisit("2026-04-30")
+        assertTrue(repository.shouldRequestReview())
+    }
+
+    @Test
+    fun `never asks for a review again once it was requested`() {
+        listOf("2026-04-28", "2026-04-29", "2026-04-30").forEach(repository::recordVisit)
+
+        repository.saveReviewShown()
+
+        assertFalse(repository.shouldRequestReview())
+    }
 }

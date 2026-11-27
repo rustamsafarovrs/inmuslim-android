@@ -87,4 +87,19 @@ class UserRepository
     fun saveReviewShown() {
         preferences.saveReviewShown()
     }
+
+    fun recordVisit(date: String) {
+        if (preferences.visitDate != date) {
+            preferences.visitDate = date
+            preferences.visitDays += 1
+        }
+    }
+
+    fun shouldRequestReview(): Boolean {
+        return !preferences.isReviewShown() && preferences.visitDays >= REVIEW_VISIT_DAYS
+    }
+
+    private companion object {
+        const val REVIEW_VISIT_DAYS = 3
+    }
 }

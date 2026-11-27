@@ -1,6 +1,9 @@
 package tj.rsdevteam.inmuslim.utils
 
+import tj.rsdevteam.inmuslim.core.utils.DateUtils
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 object TimeUtils {
@@ -34,13 +37,15 @@ object TimeUtils {
         return time
     }
 
-    fun getCurrentTimeInSeconds(): Int {
-        val calendar = Calendar.getInstance()
+    fun secondsOfDay(millis: Long): Int {
+        val calendar = Calendar.getInstance().apply { timeInMillis = millis }
         val h = calendar.get(Calendar.HOUR_OF_DAY)
         val m = calendar.get(Calendar.MINUTE)
         val s = calendar.get(Calendar.SECOND)
         return h * SECONDS_IN_HOUR + m * SECONDS_IN_MINUTE + s
     }
+
+    fun isoDate(millis: Long): String = SimpleDateFormat(DateUtils.ISO_DATE, Locale.US).format(Date(millis))
 
     internal fun formatCountdown(seconds: Int): String {
         val total = seconds.coerceAtLeast(0)

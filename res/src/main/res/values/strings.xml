@@ -41,6 +41,9 @@
     <string name="common_description_change_language">Интихоби забони барнома</string>
     <string name="common_other_today">Имрӯз</string>
     <string name="common_other_yesterday">Дирӯз</string>
+    <string name="common_action_ok">Хуб</string>
+    <string name="common_description_no_connection">Пайвастшавӣ ба интернет нест</string>
+    <string name="common_description_unknown_error">Хатогӣ рух дод. Баъдтар дубора кӯшиш кунед.</string>
 
     <!-- Tasbih -->
     <string name="tasbih_title_tasbih">Тасбеҳ</string>

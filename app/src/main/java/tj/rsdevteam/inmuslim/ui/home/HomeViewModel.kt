@@ -17,6 +17,8 @@ import tj.rsdevteam.inmuslim.data.repositories.TimingRepository
 import tj.rsdevteam.inmuslim.data.repositories.UserRepository
 import tj.rsdevteam.inmuslim.utils.TimeUtils
 import tj.rsdevteam.inmuslim.utils.Utils
+import tj.rsdevteam.inmuslim.utils.WallClock
+import tj.rsdevteam.inmuslim.utils.toErrorText
 import tj.rstech.uicomponents.bottomsheet.error.ErrorBottomSheetConfig
 import javax.inject.Inject
 
@@ -31,6 +33,7 @@ class HomeViewModel
     private val analytics: AnalyticsTracker,
     private val timingRepository: TimingRepository,
     private val userRepository: UserRepository,
+    private val clock: WallClock,
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeScreenState())
@@ -38,8 +41,10 @@ class HomeViewModel
 
     private var clockJob: Job? = null
 
+    // Null after a failed load: the next DidStart retries it, the clock doesn't
+    private var timingDate: String? = null
+
     init {
-        state = state.copy(isReviewShown = userRepository.isReviewShown())
         if (userRepository.getUserId() != -1L) {
             if (userRepository.getFirebaseToken().isEmpty()) {
                 updateMessagingId()
@@ -49,6 +54,7 @@ class HomeViewModel
     }
 
     private fun getTiming() {
+        timingDate = today()
         viewModelScope.launch {
             val isFirstLoad = state.timing == null
             timingRepository.getTiming().collect { rs ->
@@ -60,12 +66,10 @@ class HomeViewModel
                     }
 
                     is Resource.Error -> {
+                        timingDate = null
                         analytics.log(AnalyticsEvent.TimingLoadFailed(rs.error?.message))
                         state = state.copy(
-                            errorBottomSheetConfig = ErrorBottomSheetConfig(
-                                msg = rs.error?.message,
-                                title = "Error",
-                            ),
+                            errorBottomSheetConfig = ErrorBottomSheetConfig(msg = rs.error.toErrorText()),
                         )
                     }
                 }
@@ -110,7 +114,7 @@ class HomeViewModel
             is HomeUIEvent.Refresh -> refresh()
             is HomeUIEvent.ReviewShowed -> reviewShowed()
             is HomeUIEvent.DismissDialog -> dismissDialog()
-            is HomeUIEvent.DidStart -> startClock()
+            is HomeUIEvent.DidStart -> didStart()
             is HomeUIEvent.DidStop -> clockJob?.cancel()
         }
     }
@@ -125,35 +129,42 @@ class HomeViewModel
     fun reviewShowed() {
         analytics.log(AnalyticsEvent.InAppReviewRequested)
         userRepository.saveReviewShown()
-        state = state.copy(isReviewShown = true)
+        state = state.copy(shouldRequestReview = false)
     }
 
     fun dismissDialog() {
         state = state.copy(errorBottomSheetConfig = null)
     }
 
-    private fun startClock() {
+    private fun didStart() {
+        val today = today()
+        userRepository.recordVisit(today)
+        state = state.copy(shouldRequestReview = userRepository.shouldRequestReview())
+        if (timingDate != today) {
+            getTiming()
+        }
         clockJob?.cancel()
         clockJob = viewModelScope.launch {
             while (isActive) {
+                if (timingDate != null && timingDate != today()) {
+                    getTiming()
+                }
                 updateSchedule()
-                delay(MILLIS_IN_SECOND - System.currentTimeMillis() % MILLIS_IN_SECOND)
+                delay(MILLIS_IN_SECOND - clock.millis() % MILLIS_IN_SECOND)
             }
         }
     }
 
     private fun updateSchedule() {
         val timing = state.timing ?: return
-        val now = TimeUtils.getCurrentTimeInSeconds()
-        val previous = state.hero
+        val now = TimeUtils.secondsOfDay(clock.millis())
         val hero = PrayerSchedule.heroAt(timing, now)
         val statuses = PrayerSchedule.statusesAt(timing, hero, now)
         // Same map instance lets HomeSchedule skip recomposing on every tick
         state = state.copy(hero = hero, statuses = if (statuses == state.statuses) state.statuses else statuses)
-        if (previous != null && (previous.prayer != hero.prayer || previous.isActive != hero.isActive)) {
-            getTiming()
-        }
     }
+
+    private fun today() = TimeUtils.isoDate(clock.millis())
 
     private companion object {
         const val MILLIS_IN_SECOND = 1_000L
